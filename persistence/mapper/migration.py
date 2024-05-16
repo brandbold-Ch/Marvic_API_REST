@@ -7,7 +7,7 @@ def migrate():
     try:
         for obj in Tables.migration_list():
             print(f"***** Migrating the table {obj[1]} *****")
-            DB.execute(obj[0])
+            DB.execute(sentence=obj[0])
 
         print("### Migration finished ###")
 

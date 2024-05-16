@@ -17,7 +17,7 @@ class UserServices:
         users.set(**user_data)
         auth.set(**auth_data)
 
-        users.get(id=users.id)
+        users.get(id=users.id, join_tables=[("Auth", "user_id"), ("Pet", "user_id")])
         print(users.format_json())
 
 

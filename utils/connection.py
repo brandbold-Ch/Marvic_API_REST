@@ -37,3 +37,6 @@ class DB:
         con.close()
 
         return data
+
+    @classmethod
+    def execute_with_transactions(cls) -> None: ...

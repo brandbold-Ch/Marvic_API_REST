@@ -2,8 +2,8 @@
 
 class Tables:
 
-    @staticmethod
-    def migrate_users_table() -> str:
+    @classmethod
+    def __migrate_users_table(cls) -> str:
         return """
             CREATE TABLE Users (
                 id UUID UNIQUE PRIMARY KEY,
@@ -13,8 +13,8 @@ class Tables:
             );
         """
 
-    @staticmethod
-    def migrate_auth_table() -> str:
+    @classmethod
+    def __migrate_auth_table(cls) -> str:
         return """
             CREATE TABLE Auth (
                 id UUID UNIQUE PRIMARY KEY,
@@ -26,8 +26,8 @@ class Tables:
             );
         """
 
-    @staticmethod
-    def migrate_pet_table() -> str:
+    @classmethod
+    def __migrate_pet_table(cls) -> str:
         return """
             CREATE TABLE Pet (
                 id UUID UNIQUE PRIMARY KEY,
@@ -41,12 +41,11 @@ class Tables:
                 weight FLOAT,
                 live BOOLEAN,
                 CONSTRAINT fk_pet_id FOREIGN KEY (user_id) REFERENCES Users(id)
-
             );
         """
 
-    @staticmethod
-    def migrate_medical_history_table() -> str:
+    @classmethod
+    def __migrate_medical_history_table(cls) -> str:
         return """
             CREATE TABLE MedicalHistory (
                 id UUID UNIQUE PRIMARY KEY,
@@ -56,8 +55,8 @@ class Tables:
             );
         """
 
-    @staticmethod
-    def migrate_quote_table() -> str:
+    @classmethod
+    def __migrate_quote_table(cls) -> str:
         return """
             CREATE TABLE Quote (
                 id UUID UNIQUE PRIMARY KEY,
@@ -70,8 +69,8 @@ class Tables:
             );
         """
 
-    @staticmethod
-    def migrate_image_table() -> str:
+    @classmethod
+    def __migrate_image_table(cls) -> str:
         return """
             CREATE TABLE Image (
                 id UUID UNIQUE PRIMARY KEY,
@@ -83,8 +82,8 @@ class Tables:
             );
         """
 
-    @staticmethod
-    def migrate_document_table() -> str:
+    @classmethod
+    def __migrate_document_table(cls) -> str:
         return """
             CREATE TABLE Document (
                 id UUID UNIQUE PRIMARY KEY,
@@ -94,14 +93,15 @@ class Tables:
             );
         """
 
-    @staticmethod
-    def migration_list() -> list[tuple[str, str]]:
+    @classmethod
+    def migration_list(cls) -> list[tuple[str, str]]:
         return [
-            (Tables.migrate_users_table(), "Users"),
-            (Tables.migrate_auth_table(), "Auth"),
-            (Tables.migrate_pet_table(), "Pet"),
-            (Tables.migrate_quote_table(), "Quote"),
-            (Tables.migrate_medical_history_table(), "MedicalHistory"),
-            (Tables.migrate_image_table(), "Image"),
-            (Tables.migrate_document_table(), "Document")
+            (cls.__migrate_users_table(), "Users"),
+            (cls.__migrate_auth_table(), "Auth"),
+            (cls.__migrate_pet_table(), "Pet"),
+            (cls.__migrate_quote_table(), "Quote"),
+            (cls.__migrate_medical_history_table(), "MedicalHistory"),
+            (cls.__migrate_image_table(), "Image"),
+            (cls.__migrate_document_table(), "Document")
         ]
+

@@ -1,4 +1,4 @@
-from persistence.mapper.mapper_class import RelationalMapper
+from persistence.mapper.relational_mapper import RelationalMapper
 
 
 class MedicalHistory(RelationalMapper):
