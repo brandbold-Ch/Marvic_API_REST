@@ -1,6 +1,5 @@
 from pydantic import BaseModel, field_validator, Field
 from typing import Annotated
-from uuid import UUID, uuid4
 
 
 specie_choices: list = ["Gato", "Perro", "Otro"]
@@ -8,8 +7,6 @@ gender_choices: list = ["Macho", "Hembra"]
 
 
 class Pet(BaseModel):
-    id: UUID = Field(default=uuid4())
-    user_id: UUID
     name: str = Annotated[None, Field(max_length=30)]
     specie: str
     gender: str

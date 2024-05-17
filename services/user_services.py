@@ -1,37 +1,25 @@
-import uuid
-
-from models.user_model import Users
+from utils.config_orm import Base, engine, Session
+from models.user_model import User
 from models.auth_model import Auth
 
 
 class UserServices:
 
-    def __init__(self): ...
+    def __init__(self):
+        Base.metadata.create_all(engine)
+        self.session = Session()
 
-    def create_user(self, user_data: dict, auth_data: dict):
-        users = Users(**user_data)
-        auth = Auth()
+    def create_user(self, user_data: dict, auth_data: dict) -> None:
+        try:
+            user = User(**user_data)
+            auth = Auth(**auth_data, user_id=user.id)
 
-        auth_data["user_id"] = users.id
+            self.session.add(user)
+            self.session.add(auth)
+            self.session.commit()
 
-        users.set(**user_data)
-        auth.set(**auth_data)
+        except:
+            self.session.rollback()
 
-        users.get(id=users.id, join_tables=[("Auth", "user_id"), ("Pet", "user_id")])
-        print(users.format_json())
-
-
-user = UserServices()
-user.create_user({
-    "id": str(uuid.uuid4()),
-    "name": "Katerina Loba",
-    "lastname": "Koslova Monroe Soap",
-    "phone_number": "9617105170"
-    },
-    {
-        "id": str(uuid.uuid4()),
-        "email": "kastez36q5@gmail.com",
-        "password": "locote",
-        "role": "USER"
-    }
-)
+        finally:
+            self.session.close()

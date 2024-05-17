@@ -1,10 +1,7 @@
+from routes.user_router import users
 from fastapi import FastAPI
-from schemas.users_schema import User
 
 app = FastAPI()
 
 
-@app.post("/", tags=["User"])
-def set_user(user: User):
-    print(user)
-    return "hola"
+app.include_router(users, prefix="/users", tags=["Users Controllers"])

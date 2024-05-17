@@ -1,21 +1,15 @@
-from persistence.mapper.relational_mapper import RelationalMapper
+from sqlalchemy import Column, String, UUID, ForeignKey, ARRAY
+from sqlalchemy.orm import relationship
+from utils.config_orm import Base
+from uuid import uuid4
 
 
-class Auth(RelationalMapper):
+class Auth(Base):
 
-    def __init__(self) -> None:
-        super().__init__(self)
-        self.id = None
-        self.user_id = None
-        self.email = None
-        self.password = None
-        self.role = None
-
-    def format_json(self) -> dict:
-        return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "email": self.email,
-            "password": self.password,
-            "role": self.role
-        }
+    __tablename__ = "auth"
+    id = Column(UUID, primary_key=True)
+    user_id = Column(UUID, ForeignKey("user.id"), unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)
+    role = Column(ARRAY(String), default=["USER"])
+    user = relationship("User", back_populates="auth")

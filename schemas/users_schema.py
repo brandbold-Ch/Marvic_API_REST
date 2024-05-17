@@ -1,5 +1,5 @@
 from pydantic import BaseModel, field_validator, Field
-from uuid import UUID, uuid4
+from uuid import uuid4, UUID
 
 
 class User(BaseModel):
@@ -11,7 +11,6 @@ class User(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "id": str(uuid4()),
                 "name": "John Doe",
                 "lastname": "Katerina Koslova",
                 "phone_number": "9617105170"
