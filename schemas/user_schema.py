@@ -12,7 +12,7 @@ class User(BaseModel):
         json_schema_extra = {
             "example": {
                 "name": "John Doe",
-                "lastname": "Katerina Koslova",
+                "lastname": "Akron Dakota",
                 "phone_number": "9617105170"
             }
         }
