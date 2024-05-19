@@ -1,6 +1,7 @@
 from services.user_services import UserServices
 from schemas.user_schema import User
 
+
 class UserControllers:
 
     def __init__(self) -> None:

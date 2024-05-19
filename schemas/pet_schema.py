@@ -4,6 +4,7 @@ from typing import Annotated
 
 specie_choices: list = ["Gato", "Perro", "Otro"]
 gender_choices: list = ["Macho", "Hembra"]
+size_choices: list = ["Grande", "Pequeño", "Mediano"]
 
 
 class Pet(BaseModel):
@@ -14,7 +15,6 @@ class Pet(BaseModel):
     age: str = None
     breed: str = None
     weight: float = None
-    live: bool = Field(default=True)
 
     @field_validator("specie", mode="after")
     def specie_validator(cls, specie: str):
@@ -27,3 +27,9 @@ class Pet(BaseModel):
         if gender in gender_choices:
             return gender
         raise ValueError(f"Must be one of the following values {gender_choices}")
+
+    @field_validator("size", mode="after")
+    def size_validator(cls, size: str):
+        if size in size_choices:
+            return size
+        raise ValueError(f"Must be one of the following values {size_choices}")
