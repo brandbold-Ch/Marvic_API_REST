@@ -1,6 +1,7 @@
-from utils.status_codes import status_codes
+from utils.status_codes import status_codes, errors_codes
 
-class HandleErrors:
+
+class HandlerResponses:
 
     @staticmethod
     def __template(status: str, message: str, st_code: int, err_code: int, data: dict):
@@ -15,8 +16,18 @@ class HandleErrors:
         }
 
     @staticmethod
-    def ok(message, err_code=None, data=None):
-        return HandleErrors.__template(
+    def internal_server_error(message: str, err_code=None) -> dict:
+        return HandlerResponses.__template(
+            status="INTERNAL SERVER ERROR",
+            message=message,
+            st_code=status_codes["INTERNAL_SERVER_ERROR"],
+            err_code=err_code,
+            data={}
+        )
+
+    @staticmethod
+    def ok(message, err_code=None, data=None) -> dict:
+        return HandlerResponses.__template(
             status="OK",
             message=message,
             st_code=200,
@@ -25,8 +36,8 @@ class HandleErrors:
         )
 
     @staticmethod
-    def accepted(message, err_code=None, data=None):
-        return HandleErrors.__template(
+    def accepted(message, err_code=None, data=None) -> dict:
+        return HandlerResponses.__template(
             status="ACCEPTED",
             message=message,
             st_code=status_codes["ACCEPTED"],
@@ -35,8 +46,8 @@ class HandleErrors:
         )
 
     @staticmethod
-    def created(message, err_code=None, data=None):
-        return HandleErrors.__template(
+    def created(message, err_code=None, data=None) -> dict:
+        return HandlerResponses.__template(
             status="CREATED",
             message=message,
             st_code=status_codes["CREATED"],
@@ -46,7 +57,7 @@ class HandleErrors:
 
     @staticmethod
     def bad_request(message, err_code=None, data=None) -> dict:
-        return HandleErrors.__template(
+        return HandlerResponses.__template(
             status="BAD REQUEST",
             message=message,
             st_code=status_codes["BAD_REQUEST"],
@@ -55,8 +66,18 @@ class HandleErrors:
         )
 
     @staticmethod
+    def unprocessable_entity(message, err_code=None, data=None) -> dict:
+        return HandlerResponses.__template(
+            status="UNPROCESSABLE ENTITY",
+            message=message,
+            st_code=status_codes["UNPROCESSABLE_ENTITY"],
+            err_code=err_code,
+            data=data
+        )
+
+    @staticmethod
     def not_found(message, err_code=None, data=None) -> dict:
-        return HandleErrors.__template(
+        return HandlerResponses.__template(
             status="NOT FOUND",
             message=message,
             st_code=status_codes["NOT_FOUND"],

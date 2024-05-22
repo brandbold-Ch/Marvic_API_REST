@@ -26,12 +26,3 @@ async def validate_update_user_data(request: Request) -> dict:
 
     except ValidationError:
         raise ValidationError
-
-
-async def user_exist(request: Request) -> None:
-    try:
-        user_data: dict = await request.json()
-        email: str = user_data["auth_data"]["email"]
-
-    except:
-        ...
