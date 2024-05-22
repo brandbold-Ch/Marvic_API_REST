@@ -1,9 +1,10 @@
 from errors.exception_classes import DuplicatedInDatabase, DoesNotExistInDatabase, InvalidUUID
 from sqlalchemy.sql.expression import update, delete
 from utils.config_orm import Base, engine, Session
-from sqlalchemy.exc import IntegrityError, DataError
-from models.user_model import User
-from models.auth_model import Auth
+from sqlalchemy.exc import IntegrityError, DataError, SQLAlchemyError
+from models.user_model import UserModel
+from models.auth_model import AuthModel
+from sqlalchemy import and_
 
 
 class UserServices:
@@ -14,16 +15,20 @@ class UserServices:
 
     def create_user(self, user_data: dict, auth_data: dict) -> None:
         try:
-            user = User(**user_data)
-            auth = Auth(**auth_data, user_id=user.id)
+            user = UserModel(**user_data)
+            auth = AuthModel(**auth_data, user_id=user.id)
 
             self.session.add(user)
             self.session.add(auth)
             self.session.commit()
 
-        except IntegrityError as error:
+        except IntegrityError:
             self.session.rollback()
-            raise DuplicatedInDatabase(error)
+            raise DuplicatedInDatabase("That account already exists")
+
+        except SQLAlchemyError:
+            self.session.rollback()
+            raise Exception("There was a conflict in the database query ⚠️")
 
         finally:
             self.session.close()
@@ -33,27 +38,34 @@ class UserServices:
             self.get_user(user_id)
             del user_data["id"]
 
-            stmt = update(User).where(User.id == user_id).values(**user_data)
+            stmt = update(UserModel).where(and_(*[UserModel.id == user_id])).values(**user_data)
             self.session.execute(stmt)
             self.session.commit()
 
-        except DataError as error:
+        except DataError:
             self.session.rollback()
-            raise InvalidUUID(error)
+            raise InvalidUUID("UUID with invalid format 🆔")
+
+        except SQLAlchemyError:
+            self.session.rollback()
+            raise Exception("There was a conflict in the database query ⚠️")
 
         finally:
             self.session.close()
 
-    def get_user(self, user_id: str) -> User:
+    def get_user(self, user_id: str) -> dict:
         try:
-            user = self.session.query(User).get(user_id)
+            user_data = self.session.query(UserModel).get(user_id)
 
-            if user:
-                return user
-            raise DoesNotExistInDatabase("The entity does not exist")
+            if user_data is None:
+                raise DoesNotExistInDatabase("The user does not exist ❌")
+            return user_data.to_representation()
 
-        except DataError as error:
-            raise InvalidUUID(error)
+        except DataError:
+            raise InvalidUUID("UUID with invalid format 🆔")
+
+        except SQLAlchemyError:
+            raise Exception("There was a conflict in the database query ⚠️")
 
         finally:
             self.session.close()
@@ -62,12 +74,17 @@ class UserServices:
         try:
             self.get_user(user_id)
 
-            stmt = delete(User).where(User.id == user_id)
+            stmt = delete(UserModel).where(and_(*[UserModel.id == user_id]))
             self.session.execute(stmt)
             self.session.commit()
 
-        except DataError as error:
-            raise InvalidUUID(error)
+        except DataError:
+            self.session.rollback()
+            raise InvalidUUID("UUID with invalid format 🆔")
+
+        except SQLAlchemyError:
+            self.session.rollback()
+            raise Exception("There was a conflict in the database query ⚠️")
 
         finally:
             self.session.close()

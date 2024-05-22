@@ -1,5 +1,4 @@
 from services.user_services import UserServices
-from schemas.user_schema import User
 
 
 class UserControllers:
@@ -13,7 +12,7 @@ class UserControllers:
     def update_user(self, user_data: dict, user_id: str) -> None:
         self.user.update_user(user_data, user_id)
 
-    def get_user(self, user_id: str) -> User:
+    def get_user(self, user_id: str) -> dict:
         return self.user.get_user(user_id)
 
     def delete_user(self, user_id: str) -> None:

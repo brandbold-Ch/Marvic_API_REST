@@ -4,17 +4,9 @@ import bcrypt
 
 
 class Auth(BaseModel):
-    id: UUID = Field(default=uuid4())
+    id: UUID = Field(default_factory=lambda: uuid4())
     email: EmailStr
     password: str
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "email": "example@gmail.com",
-                "password": "example_pwd",
-            }
-        }
 
     @field_validator("password", mode="after")
     def password_validator(cls, pwd: str) -> str | ValueError:

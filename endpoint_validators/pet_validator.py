@@ -1,7 +1,7 @@
+from errors.exception_classes import ErrorInFields
 from schemas.pet_schema import Pet
 from fastapi.requests import Request
 from pydantic import ValidationError
-from errors.exception_classes import ErrorInFields
 
 
 async def validate_create_pet_data(request: Request) -> dict:
@@ -13,4 +13,4 @@ async def validate_create_pet_data(request: Request) -> dict:
         return Pet(**pet_data).dict()
 
     except ValidationError as error:
-        raise ErrorInFields(error.errors()[0]["msg"])
+        raise ErrorInFields(error)
