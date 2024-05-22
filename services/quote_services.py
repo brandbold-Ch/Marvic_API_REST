@@ -1,6 +1,6 @@
 from errors.exception_classes import DoesNotExistInDatabase, InvalidUUID
-from sqlalchemy.exc import DataError
 from utils.config_orm import Base, engine, Session
+from sqlalchemy.exc import DataError
 from sqlalchemy.sql import delete
 from models.quote_model import QuoteModel
 from models.pet_model import PetModel

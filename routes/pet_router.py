@@ -1,4 +1,4 @@
-from errors.exception_classes import ErrorInFields, DoesNotExistInDatabase, InvalidUUID, UnknownError
+from errors.exception_classes import ErrorInFields, DoesNotExistInDatabase, InvalidUUID
 from endpoint_validators.pet_validator import validate_create_pet_data
 from fastapi import APIRouter, Path, Form, UploadFile
 from endpoint_validators.user_validator import Request

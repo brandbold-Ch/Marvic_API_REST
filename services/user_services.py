@@ -1,7 +1,7 @@
 from errors.exception_classes import DuplicatedInDatabase, DoesNotExistInDatabase, InvalidUUID
+from sqlalchemy.exc import IntegrityError, DataError, SQLAlchemyError
 from sqlalchemy.sql.expression import update, delete
 from utils.config_orm import Base, engine, Session
-from sqlalchemy.exc import IntegrityError, DataError, SQLAlchemyError
 from models.user_model import UserModel
 from models.auth_model import AuthModel
 from sqlalchemy import and_
