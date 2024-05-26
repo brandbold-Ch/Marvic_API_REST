@@ -1,5 +1,6 @@
 from pydantic import BaseModel, field_validator, Field
 from uuid import uuid4, UUID
+from fastapi import UploadFile
 from typing import Optional, Union
 
 
@@ -10,7 +11,7 @@ size_choices: list = ["Grande", "Pequeño", "Mediano"]
 
 class Pet(BaseModel):
     id: UUID = Field(default_factory=lambda: uuid4())
-    name: Optional[str] = Field(max_length=30, default=None)
+    name: Optional[str] = Field(max_length=25, default=None)
     specie: str
     gender: str
     size: Optional[str] = None
@@ -18,6 +19,7 @@ class Pet(BaseModel):
     breed: Optional[str] = None
     weight: Union[Optional[float], Optional[str]] = None
     is_live: Optional[bool] = Field(default=True)
+    image: Union[Optional[str], Optional[UploadFile]] = None
 
     class Config:
         from_attributes = True
@@ -69,3 +71,9 @@ class Pet(BaseModel):
         if is_live == "":
             return None
         return is_live
+
+    @field_validator("image", mode="after")
+    def image_validator(cls, image: UploadFile):
+        if image == "":
+            return None
+        return image

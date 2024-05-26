@@ -7,7 +7,7 @@ class PetModel(Base):
     __tablename__ = "pet"
     id = Column(UUID, primary_key=True)
     user_id = Column(UUID, ForeignKey("user.id"), nullable=False)
-    name = Column(String(30))
+    name = Column(String(25), nullable=True)
     specie = Column(String(5), nullable=False)
     gender = Column(String(6), nullable=False)
     size = Column(String(7), nullable=True)
@@ -16,7 +16,7 @@ class PetModel(Base):
     weight = Column(Float, nullable=True)
     is_live = Column(Boolean, default=True)
 
-    def to_representation(self) -> dict:
+    def to_representation(self, image: str = None) -> dict:
         return {
             "id": str(self.id),
             "user_id": str(self.user_id),
@@ -27,5 +27,6 @@ class PetModel(Base):
             "age": self.age,
             "breed": self.breed,
             "weight": self.weight,
-            "is_live": self.is_live
+            "is_live": self.is_live,
+            "image": image
         }

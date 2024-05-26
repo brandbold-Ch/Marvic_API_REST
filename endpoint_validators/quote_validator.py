@@ -7,7 +7,7 @@ from pydantic import ValidationError
 async def validate_create_quote_data(request: Request) -> dict:
     try:
         quote_data = await request.json()
-        return Quote(**quote_data).dict()
+        return Quote(**quote_data).model_dump()
 
     except ValidationError as error:
         raise ErrorInFields(error)

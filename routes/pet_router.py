@@ -1,6 +1,6 @@
 from errors.exception_classes import ErrorInFields, DoesNotExistInDatabase, InvalidUUID
 from endpoint_validators.pet_validator import validate_create_pet_data
-from fastapi import APIRouter, Path, Form, UploadFile
+from fastapi import APIRouter, Path, Form, UploadFile, File
 from endpoint_validators.user_validator import Request
 from controllers.pet_controller import PetController
 from errors.http_error_handler import HandlerResponses
@@ -25,11 +25,11 @@ async def create_pet(
         age: Annotated[str, Form(...)] = None,
         breed: Annotated[str, Form(...)] = None,
         weight: Annotated[float, Form(...)] = None,
-        images: Annotated[UploadFile(...), Form(...)] = None
+        image: Annotated[UploadFile, File()] = None
 ) -> JSONResponse:
     try:
         pet_data: dict = await validate_create_pet_data(request)
-        pet_controller.create_pet(user_id, pet_data)
+        await pet_controller.create_pet(user_id, pet_data)
 
         return JSONResponse(
             status_code=201,
@@ -64,7 +64,7 @@ async def create_pet(
 @pets.get("/")
 async def get_pets(request: Request, user_id: Annotated[str, Path(max_length=36)]) -> list[dict] | Any:
     try:
-        return pet_controller.get_pets(user_id)
+        return await pet_controller.get_pets(user_id)
 
     except InvalidUUID as error:
         return JSONResponse(
@@ -92,7 +92,7 @@ async def get_pet(
         pet_id: Annotated[str, Path(max_length=36)]
 ) -> dict | Any:
     try:
-        return pet_controller.get_pet(user_id, pet_id)
+        return await pet_controller.get_pet(user_id, pet_id)
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
@@ -126,11 +126,11 @@ async def update_pet(
         breed: Annotated[str, Form(...)] = None,
         weight: Annotated[float, Form(...)] = None,
         is_live: Annotated[bool, Form()] = None,
-        images: Annotated[UploadFile(...), Form(...)] = None
+        image: Annotated[UploadFile, File()] = None
 ) -> JSONResponse:
     try:
         pet_data: dict = await validate_create_pet_data(request)
-        pet_controller.update_pet(user_id, pet_id, pet_data)
+        await pet_controller.update_pet(user_id, pet_id, pet_data)
 
         return JSONResponse(
             status_code=202,
@@ -169,7 +169,7 @@ async def get_pet(
         pet_id: Annotated[str, Path(max_length=36)]
 ) -> JSONResponse:
     try:
-        pet_controller.delete_pet(user_id, pet_id)
+        await pet_controller.delete_pet(user_id, pet_id)
         return JSONResponse(status_code=204, content=None)
 
     except DoesNotExistInDatabase as error:

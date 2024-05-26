@@ -64,7 +64,8 @@ class UserServices:
         except DataError:
             raise InvalidUUID("UUID with invalid format 🆔")
 
-        except SQLAlchemyError:
+        except SQLAlchemyError as error:
+            print(error)
             raise Exception("There was a conflict in the database query ⚠️")
 
         finally:

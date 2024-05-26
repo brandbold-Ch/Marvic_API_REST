@@ -1,9 +1,9 @@
 from errors.exception_classes import DoesNotExistInDatabase, InvalidUUID
 from models.quote_model import QuoteModel
 from models.user_model import UserModel
-from sqlalchemy.exc import DataError
 from models.pet_model import PetModel
 from utils.config_orm import Session
+from sqlalchemy.exc import DataError
 
 
 class MWServices:

@@ -2,9 +2,9 @@ from endpoint_validators.user_validator import validate_create_user_data, valida
 from controllers.user_controller import UserControllers
 from endpoint_validators.user_validator import Request
 from errors.http_error_handler import HandlerResponses
-from fastapi import APIRouter, Path, Body
 from utils.status_codes import errors_codes
 from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Path, Body, status
 from schemas.user_schema import User
 from typing import Any, Annotated
 from errors.exception_classes import (
@@ -31,25 +31,25 @@ async def create_user(
         user_data, auth_data = await validate_create_user_data(request)
         user_controller.create_user(user_data, auth_data)
         return JSONResponse(
-            status_code=201,
+            status_code=status.HTTP_201_CREATED,
             content=HandlerResponses.created("Created user", data=await request.json())
         )
 
     except ErrorInFields as error:
         return JSONResponse(
-            status_code=422,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=HandlerResponses.unprocessable_entity(str(error), errors_codes["JSON_INVALID_DATA_TYPE"])
         )
 
     except DuplicatedInDatabase as error:
         return JSONResponse(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content=HandlerResponses.bad_request(str(error), errors_codes["DB_DUPLICATED_KEY"])
         )
 
     except Exception as error:
         return JSONResponse(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
         )
 
@@ -66,31 +66,31 @@ async def update_user(
         user_data: dict = await validate_update_user_data(request)
         user_controller.update_user(user_data, user_id)
         return JSONResponse(
-            status_code=202,
+            status_code=status.HTTP_202_ACCEPTED,
             content=HandlerResponses.created("Updated user", data=user_data)
         )
 
     except ErrorInFields as error:
         return JSONResponse(
-            status_code=422,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=HandlerResponses.unprocessable_entity(str(error), errors_codes["JSON_INVALID_DATA_TYPE"])
         )
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
         )
 
     except InvalidUUID as error:
         return JSONResponse(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except Exception as error:
         return JSONResponse(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
         )
 
@@ -102,19 +102,19 @@ async def get_user(request: Request, user_id: Annotated[str, Path(max_length=36)
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
         )
 
     except InvalidUUID as error:
         return JSONResponse(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except Exception as error:
         return JSONResponse(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
         )
 
@@ -127,18 +127,18 @@ async def delete_user(request: Request, user_id: Annotated[str, Path(max_length=
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
         )
 
     except InvalidUUID as error:
         return JSONResponse(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except Exception as error:
         return JSONResponse(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
         )

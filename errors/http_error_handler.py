@@ -1,4 +1,4 @@
-from utils.status_codes import status_codes, errors_codes
+from utils.status_codes import status_codes
 
 
 class HandlerResponses:

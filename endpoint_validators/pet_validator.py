@@ -8,9 +8,7 @@ async def validate_create_pet_data(request: Request) -> dict:
     try:
         form_data = await request.form()
         pet_data = dict(form_data.items())
-
-        del pet_data["images"]
-        return Pet(**pet_data).dict()
+        return Pet(**pet_data).model_dump()
 
     except ValidationError as error:
         raise ErrorInFields(error)

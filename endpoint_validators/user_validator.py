@@ -16,7 +16,7 @@ async def validate_create_user_data(request: Request) -> tuple[dict, dict]:
 
         user = User(name=name, lastname=lastname, phone_number=phone_number)
         auth = Auth(email=email, password=password)
-        return user.dict(), auth.dict()
+        return user.model_dump(), auth.model_dump()
 
     except ValidationError as error:
         raise ErrorInFields(error)

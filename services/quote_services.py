@@ -1,13 +1,13 @@
 from errors.exception_classes import DoesNotExistInDatabase, InvalidUUID
 from utils.config_orm import Base, engine, Session
+from services.mw_services import MWServices
+from sqlalchemy.exc import SQLAlchemyError
+from models.quote_model import QuoteModel
+from models.user_model import UserModel
+from models.pet_model import PetModel
 from sqlalchemy.exc import DataError
 from sqlalchemy.sql import delete
-from models.quote_model import QuoteModel
-from models.pet_model import PetModel
-from models.user_model import UserModel
 from sqlalchemy import and_
-from sqlalchemy.exc import SQLAlchemyError
-from services.mw_services import MWServices
 
 
 class QuoteServices:
