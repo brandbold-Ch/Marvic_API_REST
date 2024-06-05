@@ -1,4 +1,3 @@
-from errors.exception_classes import DoesNotExistInDatabase, InvalidUUID
 from sqlalchemy.exc import DataError, SQLAlchemyError
 from utils.config_orm import Base, engine, Session
 from services.mw_services import MWServices
@@ -8,6 +7,11 @@ from utils.image_tools import upload_image, delete_image
 from models.image_model import ImageModel
 from sqlalchemy import and_
 from uuid import uuid4
+from errors.handler_exceptions import (
+    handle_data_error, 
+    handle_sqlalchemy_error,
+    handle_do_not_exists
+)
 
 
 class PetServices:
@@ -20,6 +24,7 @@ class PetServices:
     async def create_pet(self, user_id: str, pet_data: dict) -> None:
         success: bool = False
         image_path: str = None
+
         try:
             self.mw.get_user(user_id)
             pet_data["user_id"] = user_id
@@ -35,44 +40,33 @@ class PetServices:
 
         except DataError:
             self.session.rollback()
-            raise InvalidUUID("UUID with invalid format 🆔")
+            handle_data_error()
 
         except SQLAlchemyError:
             self.session.rollback()
-            raise Exception("There was a conflict in the database query ⚠️")
+            handle_sqlalchemy_error()
   
         finally:
             if success is False and image_path is not None:
                 await delete_image(image_path)
-                
             self.session.close()          
 
     async def get_pets(self, user_id: str) -> list[dict]:
         try:
             self.mw.get_user(user_id)
-            pets_list: list = []
 
             pets = (self.session.query(PetModel).filter(and_(*[
                 PetModel.user_id == user_id
             ])).all())
             
-            for pet in pets:
-                image = self.session.query(ImageModel).filter(
-                    and_(*[ImageModel.pet_id == pet.id])
-                ).first()
-                
-                if image:
-                    pets_list.append(pet.to_representation(image.image))
-                else:
-                    pets_list.append(pet.to_representation())
-
-            return pets_list
+            return [pet.to_dict() for pet in pets]
 
         except DataError:
-            raise InvalidUUID("UUID with invalid format 🆔")
+            handle_data_error()
 
         except SQLAlchemyError as err:
-            raise Exception("There was a conflict in the database query ⚠️")
+            print(err)
+            handle_sqlalchemy_error()
 
         finally:
             self.session.close()
@@ -84,22 +78,17 @@ class PetServices:
             pet_data = self.session.query(PetModel).filter(
                 and_(*[PetModel.user_id == user_id, PetModel.id == pet_id])
             ).first()
-            image_data = self.session.query(ImageModel).filter(
-                and_(*[ImageModel.pet_id == pet_id])
-            ).first()
 
             if pet_data:
-                if image_data:
-                    return pet_data.to_representation(image_data.image)
-                return pet_data.to_representation()
+                return pet_data.to_dict()
             else:
-                raise DoesNotExistInDatabase("The pet does not exist ❌")
+                handle_do_not_exists("pet")
 
         except DataError:
-            raise InvalidUUID("UUID with invalid format 🆔")
+            handle_data_error()
 
         except SQLAlchemyError:
-            raise Exception("There was a conflict in the database query ⚠️")
+            handle_sqlalchemy_error()
 
         finally:
             self.session.close()
@@ -117,11 +106,11 @@ class PetServices:
 
         except DataError:
             self.session.rollback()
-            raise InvalidUUID("UUID with invalid format 🆔")
+            handle_data_error()
 
         except SQLAlchemyError:
             self.session.rollback()
-            raise Exception("There was a conflict in the database query")
+            handle_sqlalchemy_error()
 
         finally:
             self.session.close()
@@ -139,11 +128,11 @@ class PetServices:
 
         except DataError:
             self.session.rollback()
-            raise InvalidUUID("UUID with invalid format 🆔")
+            handle_data_error()
 
         except SQLAlchemyError:
             self.session.rollback()
-            raise Exception("There was a conflict in the database query ⚠️")
+            handle_sqlalchemy_error()
 
         finally:
             self.session.close()

@@ -1,10 +1,16 @@
-from errors.exception_classes import DuplicatedInDatabase, DoesNotExistInDatabase, InvalidUUID
 from sqlalchemy.exc import IntegrityError, DataError, SQLAlchemyError
 from sqlalchemy.sql.expression import update, delete
 from utils.config_orm import Base, engine, Session
 from models.user_model import UserModel
 from models.auth_model import AuthModel
+from models.pet_model import PetModel
 from sqlalchemy import and_
+from errors.handler_exceptions import (
+    handle_data_error, 
+    handle_sqlalchemy_error, 
+    handle_integrity_error, 
+    handle_do_not_exists
+)
 
 
 class UserServices:
@@ -15,20 +21,19 @@ class UserServices:
 
     def create_user(self, user_data: dict, auth_data: dict) -> None:
         try:
-            user = UserModel(**user_data)
-            auth = AuthModel(**auth_data, user_id=user.id)
+            auth_data["user_id"] = user_data["id"]
 
-            self.session.add(user)
-            self.session.add(auth)
+            self.session.add(UserModel(**user_data))
+            self.session.add(AuthModel(**auth_data))
             self.session.commit()
 
         except IntegrityError:
             self.session.rollback()
-            raise DuplicatedInDatabase("That account already exists")
+            handle_integrity_error()
 
         except SQLAlchemyError:
             self.session.rollback()
-            raise Exception("There was a conflict in the database query ⚠️")
+            handle_sqlalchemy_error()
 
         finally:
             self.session.close()
@@ -38,17 +43,15 @@ class UserServices:
             self.get_user(user_id)
             del user_data["id"]
 
-            stmt = update(UserModel).where(and_(*[UserModel.id == user_id])).values(**user_data)
+            stmt = (update(UserModel)
+                    .where(and_(*[UserModel.id == user_id]))
+                    .values(**user_data))
             self.session.execute(stmt)
             self.session.commit()
 
-        except DataError:
-            self.session.rollback()
-            raise InvalidUUID("UUID with invalid format 🆔")
-
         except SQLAlchemyError:
             self.session.rollback()
-            raise Exception("There was a conflict in the database query ⚠️")
+            handle_sqlalchemy_error()
 
         finally:
             self.session.close()
@@ -58,15 +61,14 @@ class UserServices:
             user_data = self.session.query(UserModel).get(user_id)
 
             if user_data is None:
-                raise DoesNotExistInDatabase("The user does not exist ❌")
-            return user_data.to_representation()
+                handle_do_not_exists("user")
+            return user_data.to_dict()
 
         except DataError:
-            raise InvalidUUID("UUID with invalid format 🆔")
+            handle_data_error()
 
-        except SQLAlchemyError as error:
-            print(error)
-            raise Exception("There was a conflict in the database query ⚠️")
+        except SQLAlchemyError:
+            handle_sqlalchemy_error()
 
         finally:
             self.session.close()
@@ -75,17 +77,18 @@ class UserServices:
         try:
             self.get_user(user_id)
 
-            stmt = delete(UserModel).where(and_(*[UserModel.id == user_id]))
-            self.session.execute(stmt)
-            self.session.commit()
+            stmt_auth = delete(AuthModel).where(and_(*[AuthModel.user_id == user_id]))
+            stmt_user = delete(UserModel).where(and_(*[UserModel.id == user_id]))
+            stmt_pets = delete(PetModel).where(and_(*[PetModel.user_id == user_id]))
 
-        except DataError:
-            self.session.rollback()
-            raise InvalidUUID("UUID with invalid format 🆔")
+            self.session.execute(stmt_auth)
+            self.session.execute(stmt_user)
+            self.session.execute(stmt_pets)
+            self.session.commit()
 
         except SQLAlchemyError:
             self.session.rollback()
-            raise Exception("There was a conflict in the database query ⚠️")
+            handle_sqlalchemy_error()
 
         finally:
             self.session.close()

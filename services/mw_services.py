@@ -1,9 +1,12 @@
-from errors.exception_classes import DoesNotExistInDatabase, InvalidUUID
-from models.quote_model import QuoteModel
+from models.appointment_model import AppointmentModel
 from models.user_model import UserModel
 from models.pet_model import PetModel
 from utils.config_orm import Session
 from sqlalchemy.exc import DataError
+from errors.handler_exceptions import (
+    handle_data_error,
+    handle_do_not_exists
+)
 
 
 class MWServices:
@@ -15,26 +18,25 @@ class MWServices:
         try:
             user = self.session.query(UserModel).get(user_id)
             if user is None:
-                raise DoesNotExistInDatabase("The user does not exist ❌")
+                handle_do_not_exists("user")
 
         except DataError:
-            raise InvalidUUID("UUID with invalid format 🆔")
+            handle_data_error()
 
     def get_pet(self, pet_id: str) -> None:
         try:
             pet = self.session.query(PetModel).get(pet_id)
             if pet is None:
-                raise DoesNotExistInDatabase("The pet does not exist ❌")
+                handle_do_not_exists("pet")
 
         except DataError:
-            raise InvalidUUID("UUID with invalid format 🆔")
+            handle_data_error()
 
-    def get_quote(self, quote_id: str) -> None:
+    def get_appointment(self, appointment_id: str) -> None:
         try:
-            quote = self.session.query(QuoteModel).get(quote_id)
+            quote = self.session.query(AppointmentModel).get(appointment_id)
             if quote is None:
-                raise DoesNotExistInDatabase("The quote does not exist ❌")
+                handle_do_not_exists("appointment")
 
         except DataError:
-            raise InvalidUUID("UUID with invalid format 🆔")
-
+            handle_data_error()

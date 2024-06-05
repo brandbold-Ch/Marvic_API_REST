@@ -1,8 +1,8 @@
 from errors.exception_classes import ErrorInFields, InvalidUUID, DoesNotExistInDatabase
-from endpoint_validators.quote_validator import validate_create_quote_data
+from endpoint_validators.appointment_validator import validate_create_appointment_data
 from fastapi import APIRouter, Path
 from endpoint_validators.user_validator import Request
-from controllers.quote_controller import QuoteControllers
+from controllers.appointment_controller import AppointmentControllers
 from fastapi import Body
 from errors.http_error_handler import HandlerResponses
 from fastapi.encoders import jsonable_encoder
@@ -11,25 +11,27 @@ from fastapi.responses import JSONResponse
 from typing import Annotated, Any
 from datetime import datetime
 
-quotes = APIRouter()
-quote_controller = QuoteControllers()
+appointments = APIRouter()
+appointment_controller = AppointmentControllers()
 
 
-@quotes.post("/")
-async def create_quote(
+@appointments.post("/")
+async def create_appointment(
         request: Request,
         pet_id: Annotated[str, Path(max_length=36)],
         user_id: Annotated[str, Path(max_length=36)],
         expiration_date: Annotated[datetime, Body(...)],
-        issue: Annotated[str, Body(...)] = None
+        issue: Annotated[str, Body(...)] = None,
+        status: Annotated[str, Body(...)] = None,
+        price: Annotated[float, Body(...)]  = None
 ) -> JSONResponse:
     try:
-        quote_data: dict = await validate_create_quote_data(request)
-        quote_controller.create_quote(user_id, pet_id, quote_data)
+        appointment_data: dict = await validate_create_appointment_data(request)
+        appointment_controller.create_appointment(user_id, pet_id, appointment_data)
         
         return JSONResponse(
             status_code=201,
-            content=HandlerResponses.created("Created quote", data=jsonable_encoder(quote_data))
+            content=HandlerResponses.created("Created quote", data=jsonable_encoder(appointment_data))
         )
 
     except ErrorInFields as error:
@@ -57,14 +59,14 @@ async def create_quote(
         )
 
 
-@quotes.get("/")
-async def get_quotes(
+@appointments.get("/")
+async def get_appointments(
         request: Request,
         pet_id: Annotated[str, Path(max_length=36)],
         user_id: Annotated[str, Path(max_length=36)],
 ) -> list[dict] | Any:
     try:
-        return quote_controller.get_quotes(user_id, pet_id)
+        return appointment_controller.get_appointments(user_id, pet_id)
 
     except InvalidUUID as error:
         return JSONResponse(
@@ -85,15 +87,15 @@ async def get_quotes(
         )
 
 
-@quotes.get("/{quote_id}")
-async def get_quote(
+@appointments.get("/{appointment_id}")
+async def get_appointment(
         request: Request,
         pet_id: Annotated[str, Path(max_length=36)],
         user_id: Annotated[str, Path(max_length=36)],
-        quote_id: Annotated[str, Path(max_length=36)],
+        appointment_id: Annotated[str, Path(max_length=36)],
 ) -> dict | Any:
     try:
-        return quote_controller.get_quote(user_id, quote_id, pet_id)
+        return appointment_controller.get_appointment(user_id, appointment_id, pet_id)
 
     except InvalidUUID as error:
         return JSONResponse(
@@ -114,15 +116,15 @@ async def get_quote(
         )
 
 
-@quotes.delete("/{quote_id}")
-async def delete_quote(
+@appointments.delete("/{appointment_id}")
+async def delete_appointment(
         request: Request,
         pet_id: Annotated[str, Path(max_length=36)],
         user_id: Annotated[str, Path(max_length=36)],
-        quote_id: Annotated[str, Path(max_length=36)],
+        appointment_id: Annotated[str, Path(max_length=36)],
 ) -> JSONResponse:
     try:
-        quote_controller.delete_quotes(user_id, quote_id, pet_id)
+        appointment_controller.delete_appointment(user_id, appointment_id, pet_id)
         return JSONResponse(status_code=204, content=None)
 
     except InvalidUUID as error:

@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Boolean, Float, String, UUID, ForeignKey
+from sqlalchemy.orm import relationship
 from utils.config_orm import Base
 
 
@@ -15,18 +16,25 @@ class PetModel(Base):
     breed = Column(String(60), nullable=True)
     weight = Column(Float, nullable=True)
     is_live = Column(Boolean, default=True)
+    image = relationship("ImageModel", uselist=False, backref="pet")
 
-    def to_representation(self, image: str = None) -> dict:
+    def to_dict(self) -> dict:
         return {
             "id": str(self.id),
             "user_id": str(self.user_id),
-            "name": self.name,
-            "specie": self.specie,
-            "gender": self.gender,
-            "size": self.size,
-            "age": self.age,
-            "breed": self.breed,
-            "weight": self.weight,
-            "is_live": self.is_live,
-            "image": image
+            "basic_info": {
+                "name": self.name,
+                "specie": self.specie,
+                "breed": self.breed
+            },
+            "appearance": {
+                "gender": self.gender,
+                "size": self.size,
+                "weight": self.weight,
+                "image": self.image.image if self.image is not None else None
+            },
+            "additional_details": {
+                "age": self.age,
+                "is_live": self.is_live
+            }
         }

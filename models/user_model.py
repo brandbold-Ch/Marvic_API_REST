@@ -10,9 +10,10 @@ class UserModel(Base):
     name = Column(String(50), nullable=False)
     lastname = Column(String(50), nullable=False)
     phone_number = Column(String(10), nullable=False)
-    auth = relationship("AuthModel", uselist=False, back_populates="user", cascade="all, delete, delete-orphan")
+    auth = relationship("AuthModel", uselist=False, cascade="all, delete")
+    pets = relationship("PetModel", cascade="all, delete")
 
-    def to_representation(self) -> dict:
+    def to_dict(self) -> dict:
         return {
             "id": str(self.id),
             "name": self.name,

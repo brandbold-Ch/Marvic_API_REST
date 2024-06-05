@@ -7,6 +7,7 @@ class Auth(BaseModel):
     id: UUID = Field(default_factory=lambda: uuid4())
     email: EmailStr
     password: str
+    role: str
 
     @field_validator("password", mode="after")
     def password_validator(cls, pwd: str) -> str:
