@@ -1,16 +1,17 @@
+from utils.image_tools import upload_image, delete_image
 from sqlalchemy.exc import DataError, SQLAlchemyError
 from utils.config_orm import Base, engine, Session
 from services.mw_services import MWServices
+from models.image_model import ImageModel
 from sqlalchemy.sql import update, delete
 from models.pet_model import PetModel
-from utils.image_tools import upload_image, delete_image
-from models.image_model import ImageModel
+from sqlalchemy.orm import session
 from sqlalchemy import and_
 from uuid import uuid4
 from errors.handler_exceptions import (
-    handle_data_error, 
     handle_sqlalchemy_error,
-    handle_do_not_exists
+    handle_do_not_exists,
+    handle_data_error 
 )
 
 
@@ -18,10 +19,10 @@ class PetServices:
 
     def __init__(self) -> None:
         Base.metadata.create_all(engine)
-        self.session = Session()
+        self.session: session.Session = Session()
         self.mw = MWServices()
 
-    async def create_pet(self, user_id: str, pet_data: dict) -> None:
+    async def create_pet(self, user_id: str, pet_data: dict) -> dict:
         success: bool = False
         image_path: str = None
 
@@ -34,9 +35,12 @@ class PetServices:
                 image_path = await upload_image(image_data)
                 self.session.add(ImageModel(id=uuid4(), image=image_path, pet_id=pet_data["id"]))
 
-            self.session.add(PetModel(**pet_data))
+            pet = PetModel(**pet_data)
+            self.session.add(pet)
             self.session.commit()
             success = True
+
+            return pet.to_dict()
 
         except DataError:
             self.session.rollback()
@@ -64,8 +68,7 @@ class PetServices:
         except DataError:
             handle_data_error()
 
-        except SQLAlchemyError as err:
-            print(err)
+        except SQLAlchemyError:
             handle_sqlalchemy_error()
 
         finally:
@@ -95,7 +98,7 @@ class PetServices:
 
     async def update_pet(self, user_id: str, pet_id: str, pet_data: dict) -> None:
         try:
-            self.get_pet(user_id, pet_id)
+            await self.get_pet(user_id, pet_id)
             del pet_data["id"]
 
             stmt = (update(PetModel)
@@ -116,23 +119,35 @@ class PetServices:
             self.session.close()
 
     async def delete_pet(self, user_id: str, pet_id: str) -> None:
-        try:
-            self.get_pet(user_id, pet_id)
+        success: bool = False
+        pet_data = None
 
-            stmt = delete(PetModel).where(and_(*[
-                PetModel.user_id == user_id,
-                PetModel.id == pet_id
-            ]))
-            self.session.execute(stmt)
-            self.session.commit()
+        try:
+            pet_data = await self.get_pet(user_id, pet_id)
+
+            stmt_pet = (
+                delete(PetModel)
+                .where(and_(*[
+                    PetModel.user_id == user_id,
+                    PetModel.id == pet_id
+                ]))
+            )
+            stmt_image = delete(ImageModel).where(and_(*[ImageModel.pet_id == pet_id]))
+            self.session.execute(stmt_pet)
+            self.session.execute(stmt_image)
+            self.session.commit()          
+            success = True     
 
         except DataError:
             self.session.rollback()
             handle_data_error()
 
-        except SQLAlchemyError:
+        except SQLAlchemyError as err:
+            print(err)
             self.session.rollback()
             handle_sqlalchemy_error()
 
         finally:
+            if success and pet_data and pet_data["appearance"]["image"]:
+                await delete_image(pet_data["appearance"]["image"])
             self.session.close()

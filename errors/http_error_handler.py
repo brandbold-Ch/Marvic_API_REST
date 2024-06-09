@@ -1,11 +1,10 @@
 from utils.status_codes import status_codes
-from functools import wraps
 
 
 class HandlerResponses:
 
     @staticmethod
-    def __template(status: str, message: str, st_code: int, err_code: int, data: dict):
+    def __template(status: str, message: str, st_code: int, err_code: int, data: dict) -> dict:
         return {
             "status": status,
             "message": message,

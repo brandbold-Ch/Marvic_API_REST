@@ -6,8 +6,8 @@ class PetController:
     def __init__(self) -> None:
         self.pet = PetServices()
 
-    async def create_pet(self, user_id: str, pet_data: dict) -> None:
-        await self.pet.create_pet(user_id, pet_data)
+    async def create_pet(self, user_id: str, pet_data: dict) -> dict:
+        return await self.pet.create_pet(user_id, pet_data)
 
     async def get_pets(self, user_id: str) -> list[dict]:
         return await self.pet.get_pets(user_id)

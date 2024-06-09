@@ -1,12 +1,12 @@
-from models.price_model import PriceModel
 from utils.config_orm import Base, engine, Session
+from models.price_model import PriceModel
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.exc import DataError
 from sqlalchemy import and_, update
 from errors.handler_exceptions import (
-    handle_data_error, 
     handle_sqlalchemy_error,
-    handle_do_not_exists
+    handle_do_not_exists,
+    handle_data_error
 )
 
 

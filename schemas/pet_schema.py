@@ -1,7 +1,7 @@
 from pydantic import BaseModel, field_validator, Field
-from uuid import uuid4, UUID
-from fastapi import UploadFile
 from typing import Optional, Union
+from fastapi import UploadFile
+from uuid import uuid4, UUID
 
 
 specie_choices: list = ["Gato", "Perro", "Otro"]
@@ -77,3 +77,4 @@ class Pet(BaseModel):
         if image == "":
             return None
         return image
+    

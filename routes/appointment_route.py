@@ -1,15 +1,16 @@
 from errors.exception_classes import ErrorInFields, InvalidUUID, DoesNotExistInDatabase
 from endpoint_validators.appointment_validator import validate_create_appointment_data
-from fastapi import APIRouter, Path
-from endpoint_validators.user_validator import Request
 from controllers.appointment_controller import AppointmentControllers
-from fastapi import Body
 from errors.http_error_handler import HandlerResponses
+from fastapi.requests import Request
 from fastapi.encoders import jsonable_encoder
 from utils.status_codes import errors_codes
 from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Path
 from typing import Annotated, Any
 from datetime import datetime
+from fastapi import Body
+
 
 appointments = APIRouter()
 appointment_controller = AppointmentControllers()

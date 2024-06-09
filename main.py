@@ -1,8 +1,8 @@
-from fastapi import FastAPI
-from starlette.responses import FileResponse
 from routes.appointment_route import appointments
+from starlette.responses import FileResponse
 from routes.user_router import users
 from routes.pet_router import pets
+from fastapi import FastAPI
 
 
 app = FastAPI()

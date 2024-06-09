@@ -11,7 +11,7 @@ class UserModel(Base):
     lastname = Column(String(50), nullable=False)
     phone_number = Column(String(10), nullable=False)
     auth = relationship("AuthModel", uselist=False, cascade="all, delete")
-    pets = relationship("PetModel", cascade="all, delete")
+    pets = relationship("PetModel")
 
     def to_dict(self) -> dict:
         return {

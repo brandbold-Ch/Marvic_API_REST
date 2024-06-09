@@ -5,7 +5,7 @@ from PIL import Image
 import os
 
 
-async def upload_image(image_data: UploadFile) -> str: 
+async def upload_image(image_data: UploadFile) -> str:
     try:
         buffer = await image_data.read()
         image_stream = BytesIO(buffer)
@@ -28,4 +28,3 @@ async def upload_image(image_data: UploadFile) -> str:
 
 async def delete_image(image_path: str) -> None:
     os.remove(f"static/images/{image_path}")
-    

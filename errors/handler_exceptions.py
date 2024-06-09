@@ -1,6 +1,6 @@
 from errors.exception_classes import (
+    DoesNotExistInDatabase,
     DuplicatedInDatabase, 
-    DoesNotExistInDatabase, 
     InvalidUUID
 )
 

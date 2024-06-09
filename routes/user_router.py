@@ -1,18 +1,19 @@
 from endpoint_validators.user_validator import validate_create_user_data, validate_update_user_data
 from controllers.user_controller import UserControllers
-from endpoint_validators.user_validator import Request
 from errors.http_error_handler import HandlerResponses
+from fastapi import APIRouter, Path, Body, status
 from utils.status_codes import errors_codes
 from fastapi.responses import JSONResponse
-from fastapi import APIRouter, Path, Body, status
 from schemas.user_schema import User
+from fastapi.requests import Request
 from typing import Any, Annotated
 from errors.exception_classes import (
     DuplicatedInDatabase,
     DoesNotExistInDatabase,
-    InvalidUUID,
-    ErrorInFields
+    ErrorInFields,
+    InvalidUUID
 )
+
 
 users = APIRouter()
 user_controller = UserControllers()
@@ -28,11 +29,23 @@ async def create_user(
         password: Annotated[str, Body(...)]
 ) -> JSONResponse:
     try:
-        user_data, auth_data = await validate_create_user_data(request)
-        user_controller.create_user(user_data, auth_data)
+        result: dict[dict, dict] = user_controller.create_user(
+            *validate_create_user_data({
+                "user_data": {
+                    "name": name, 
+                    "lastname": lastname, 
+                    "phone_number": phone_number, 
+                },
+                "auth_data": {
+                    "email": email, 
+                    "password": password
+                }
+            })
+        )
+
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
-            content=HandlerResponses.created("Created user", data=await request.json())
+            content=HandlerResponses.created("Created user", data=result)
         )
 
     except ErrorInFields as error:
@@ -63,11 +76,16 @@ async def update_user(
         phone_number: Annotated[str, Body(...)],
 ) -> JSONResponse:
     try:
-        user_data: dict = await validate_update_user_data(request)
-        user_controller.update_user(user_data, user_id)
+        result: dict = user_controller.update_user(
+            validate_update_user_data({
+            "name": name, 
+            "lastname": lastname, 
+            "phone_number": phone_number, 
+        }), user_id)
+        
         return JSONResponse(
             status_code=status.HTTP_202_ACCEPTED,
-            content=HandlerResponses.created("Updated user", data=user_data)
+            content=HandlerResponses.created("Updated user", data=result)
         )
 
     except ErrorInFields as error:
@@ -98,7 +116,10 @@ async def update_user(
 @users.get("/{user_id}")
 async def get_user(request: Request, user_id: Annotated[str, Path(max_length=36)]) -> User | Any:
     try:
-        return user_controller.get_user(user_id)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, 
+            content=user_controller.get_user(user_id)
+        )
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
