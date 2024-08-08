@@ -6,6 +6,7 @@ from utils.status_codes import errors_codes
 from fastapi.responses import JSONResponse
 from schemas.user_schema import User
 from fastapi.requests import Request
+from utils.config_orm import SessionLocal
 from typing import Any, Annotated
 from errors.exception_classes import (
     DuplicatedInDatabase,
@@ -13,11 +14,17 @@ from errors.exception_classes import (
     ErrorInFields,
     InvalidUUID
 )
+from fastapi import FastAPI
 
 
+main_app = FastAPI()
 users = APIRouter()
-user_controller = UserControllers()
+user_controller = UserControllers(SessionLocal())
+users.add_event_handler
 
+@main_app.get("/")
+def test():
+    return {"ok": True}
 
 @users.post("/")
 async def create_user(

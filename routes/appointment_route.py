@@ -6,6 +6,7 @@ from fastapi.requests import Request
 from fastapi.encoders import jsonable_encoder
 from utils.status_codes import errors_codes
 from fastapi.responses import JSONResponse
+from utils.config_orm import SessionLocal
 from fastapi import APIRouter, Path
 from typing import Annotated, Any
 from datetime import datetime
@@ -13,26 +14,34 @@ from fastapi import Body
 
 
 appointments = APIRouter()
-appointment_controller = AppointmentControllers()
+appointment_controller = AppointmentControllers(SessionLocal())
 
 
 @appointments.post("/")
 async def create_appointment(
         request: Request,
-        pet_id: Annotated[str, Path(max_length=36)],
         user_id: Annotated[str, Path(max_length=36)],
+        pet_id: Annotated[str, Path(max_length=36)],
         expiration_date: Annotated[datetime, Body(...)],
         issue: Annotated[str, Body(...)] = None,
-        status: Annotated[str, Body(...)] = None,
-        price: Annotated[float, Body(...)]  = None
+        price: Annotated[float, Body(...)] = None
 ) -> JSONResponse:
     try:
-        appointment_data: dict = await validate_create_appointment_data(request)
-        appointment_controller.create_appointment(user_id, pet_id, appointment_data)
+        appointment_data: dict = appointment_controller.create_appointment(
+            user_id,
+            pet_id,
+            validate_create_appointment_data({
+                "user_id": user_id,
+                "pet_id": pet_id,
+                "expiration_date": expiration_date,
+                "issue": issue,
+                "price": price
+            })
+        )
         
         return JSONResponse(
             status_code=201,
-            content=HandlerResponses.created("Created quote", data=jsonable_encoder(appointment_data))
+            content=HandlerResponses.created("Created quote", data=appointment_data)
         )
 
     except ErrorInFields as error:
@@ -96,7 +105,7 @@ async def get_appointment(
         appointment_id: Annotated[str, Path(max_length=36)],
 ) -> dict | Any:
     try:
-        return appointment_controller.get_appointment(user_id, appointment_id, pet_id)
+        return appointment_controller.get_appointment(user_id, pet_id, appointment_id)
 
     except InvalidUUID as error:
         return JSONResponse(
@@ -125,7 +134,7 @@ async def delete_appointment(
         appointment_id: Annotated[str, Path(max_length=36)],
 ) -> JSONResponse:
     try:
-        appointment_controller.delete_appointment(user_id, appointment_id, pet_id)
+        appointment_controller.delete_appointment(user_id, pet_id, appointment_id)
         return JSONResponse(status_code=204, content=None)
 
     except InvalidUUID as error:

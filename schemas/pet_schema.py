@@ -6,7 +6,7 @@ from uuid import uuid4, UUID
 
 specie_choices: list = ["Gato", "Perro", "Otro"]
 gender_choices: list = ["Macho", "Hembra"]
-size_choices: list = ["Grande", "Pequeño", "Mediano"]
+size_choices: list = ["Grande", "Chico", "Mediano"]
 
 
 class Pet(BaseModel):

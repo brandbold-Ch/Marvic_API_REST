@@ -4,14 +4,14 @@ from fastapi import APIRouter, Path, Form, UploadFile, File, status
 from fastapi.requests import Request
 from errors.http_error_handler import HandlerResponses
 from controllers.pet_controller import PetController
-from fastapi.encoders import jsonable_encoder
 from utils.status_codes import errors_codes
 from fastapi.responses import JSONResponse
 from typing import Any, Annotated
+from utils.config_orm import SessionLocal
 
 
 pets = APIRouter()
-pet_controller = PetController()
+pet_controller = PetController(SessionLocal())
 
 
 @pets.post("/")
@@ -142,16 +142,29 @@ async def update_pet(
         age: Annotated[str, Form(...)] = None,
         breed: Annotated[str, Form(...)] = None,
         weight: Annotated[float, Form(...)] = None,
-        is_live: Annotated[bool, Form()] = None,
+        is_live: Annotated[bool, Form(...)] = None,
         image: Annotated[UploadFile, File()] = None
 ) -> JSONResponse:
     try:
-        pet_data: dict = await validate_create_pet_data(request)
-        await pet_controller.update_pet(user_id, pet_id, pet_data)
+        request_data = await pet_controller.update_pet(
+            user_id, 
+            pet_id,
+            validate_create_pet_data({
+                "specie": specie,
+                "gender": gender,
+                "name": name,
+                "size": size,
+                "age": age,
+                "breed": breed,
+                "weight": weight,
+                "image": image,
+                "is_live": is_live
+            })
+        )
 
         return JSONResponse(
             status_code=202,
-            content=HandlerResponses.accepted("Updated pet", data=jsonable_encoder(pet_data))
+            content=HandlerResponses.accepted("Updated pet", data=request_data)
         )
 
     except ErrorInFields as error:

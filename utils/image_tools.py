@@ -26,5 +26,12 @@ async def upload_image(image_data: UploadFile) -> str:
         raise Exception(error)
     
 
-async def delete_image(image_path: str) -> None:
-    os.remove(f"static/images/{image_path}")
+def delete_image(image_path: str) -> None:
+    file_path = os.path.join("static", "images", image_path)
+    
+    try:
+        os.remove(file_path)
+        print(f"Image {image_path} deleted successfully.")
+        
+    except Exception as error:
+        raise Exception(error)

@@ -1,120 +1,64 @@
-from sqlalchemy.exc import IntegrityError, DataError, SQLAlchemyError
-from sqlalchemy.sql.expression import update, delete
-from utils.config_orm import Base, engine, Session
+from errors.handler_exceptions import handle_do_not_exists
+from decorators.error_decorators import exceptions_handler
+from sqlalchemy.orm.session import Session
+from utils.config_orm import Base, engine
 from models.user_model import UserModel
 from models.auth_model import AuthModel
-from models.pet_model import PetModel
-from sqlalchemy.orm import session
-from sqlalchemy import and_
-from errors.handler_exceptions import (
-    handle_sqlalchemy_error, 
-    handle_integrity_error, 
-    handle_do_not_exists,
-    handle_data_error
-)
+from utils.image_tools import delete_image
 
 
 class UserServices:
 
-    def __init__(self) -> None:
+    def __init__(self, session: Session) -> None:
         Base.metadata.create_all(engine)
-        self.session: session.Session = Session()
+        self.session = session
 
-    def create_user(self, user_data: dict, auth_data: dict) -> dict[dict, dict]:
-        try:
-            auth_data["user_id"] = user_data["id"]
-            print(auth_data["user_id"])
-            print(user_data["id"])
+    @exceptions_handler
+    def create_user(self, user_data: dict, auth_data: dict) -> dict:
+        user_create = UserModel(**user_data)
+        auth_create = AuthModel(**auth_data, user_id=user_create.id)
 
-            user = UserModel(**user_data)
-            auth = AuthModel(**auth_data)
+        self.session.add(user_create)
+        self.session.add(auth_create)
+        self.session.commit()
 
-            self.session.add(user)
-            self.session.add(auth)
-            self.session.commit()
+        return user_create.to_dict()
 
-            return {
-                "user_data": user.to_dict(), 
-                "auth_data": auth.to_dict()
-            }
-
-        except IntegrityError:
-            self.session.rollback()
-            handle_integrity_error()
-
-        except SQLAlchemyError:
-            self.session.rollback()
-            handle_sqlalchemy_error()
-
-        finally:
-            self.session.close()
-
+    @exceptions_handler
     def update_user(self, user_data: dict, user_id: str) -> dict:
-        try:
-            del user_data["id"]
+        self.get_user(user_id)
+        del user_data["id"]
 
-            stmt = (
-                update(UserModel)
-                .where(and_(*[UserModel.id == user_id]))
-                .values(**user_data)
-                .returning(UserModel.id)
-            )
-            
-            update_result = self.session.execute(stmt)
-            self.session.commit()
+        user_update: UserModel | None = (
+            self.session.query(UserModel)
+            .where(user_id == UserModel.id)
+            .first()
+        )
+        user_update.update_fields(**user_data)
+        self.session.add(user_update)
+        self.session.commit()
 
-            if update_result.fetchone() is None:
-                handle_do_not_exists("user")
-            return self.get_user(user_id)
-
-        except SQLAlchemyError:
-            self.session.rollback()
-            handle_sqlalchemy_error()
-
-        finally:
-            self.session.close()
-
+        return user_update.to_dict()
+    
+    @exceptions_handler
     def get_user(self, user_id: str) -> dict:
-        try:
-            user_data: UserModel = self.session.get(UserModel, user_id)
+        user_data: UserModel | None = self.session.get(UserModel, user_id)
 
-            if user_data is None:
-                handle_do_not_exists("user")
-            return user_data.to_dict()
+        if user_data is None:
+            handle_do_not_exists("user")
+            
+        return user_data.to_dict()
 
-        except DataError:
-            handle_data_error()
-
-        except SQLAlchemyError:
-            handle_sqlalchemy_error()
-
-        finally:
-            self.session.close()
-
+    @exceptions_handler
     def delete_user(self, user_id: str) -> None:
-        try:
-            stmt_pets = delete(PetModel).where(and_(*[PetModel.user_id == user_id]))
-            self.session.execute(stmt_pets)
-            self.session.commit()
+        user_delete: UserModel | None = (
+            self.session.query(UserModel)
+            .where(user_id == UserModel.id)
+            .first()
+        )
+        self.session.delete(user_delete)
+        self.session.commit()
 
-            stmt_auth = delete(AuthModel).where(and_(*[AuthModel.user_id == user_id]))
-            self.session.execute(stmt_auth)
-            self.session.commit()
-
-            stmt_user = (
-                delete(UserModel)
-                .where(and_(*[UserModel.id == user_id]))
-                .returning(UserModel.id)
-            )
-            delete_result = self.session.execute(stmt_user)
-            self.session.commit()
-
-            if delete_result.fetchone() is None:
-                handle_do_not_exists("user")
-
-        except SQLAlchemyError:
-            self.session.rollback()
-            handle_sqlalchemy_error()
-
-        finally:
-            self.session.close()
+        for pet in user_delete.pets:
+            if pet.get_image() is not None:
+                delete_image(pet.get_image())

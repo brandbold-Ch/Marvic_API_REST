@@ -16,7 +16,21 @@ class PetModel(Base):
     breed = Column(String(60), nullable=True)
     weight = Column(Float, nullable=True)
     is_live = Column(Boolean, default=True)
-    image = relationship("ImageModel", uselist=False, backref="pet")
+    image = relationship(
+        "ImageModel",
+        uselist=False,
+        backref="pet",
+        cascade="all, delete-orphan"
+    )
+
+    def get_image(self) -> str | None:
+        if self.image is not None:
+            return self.image.image
+        return None
+
+    def update_fields(self, **kwargs):
+        for field, value in kwargs.items():
+            setattr(self, field, value)
 
     def to_dict(self) -> dict:
         return {
@@ -31,7 +45,7 @@ class PetModel(Base):
                 "gender": self.gender,
                 "size": self.size,
                 "weight": self.weight,
-                "image": self.image.image if self.image is not None else None
+                "image": self.get_image()
             },
             "additional_details": {
                 "age": self.age,

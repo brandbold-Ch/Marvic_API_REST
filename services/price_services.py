@@ -1,4 +1,4 @@
-from utils.config_orm import Base, engine, Session
+from utils.config_orm import Base, engine, SessionLocal
 from models.price_model import PriceModel
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.exc import DataError
@@ -14,7 +14,7 @@ class PriceService:
 
     def __init__(self) -> None:
         Base.metadata.create_all(engine)
-        self.session = Session()
+        self.session = SessionLocal()
 
     def get_price(self, price_id: str) -> dict:
         try:

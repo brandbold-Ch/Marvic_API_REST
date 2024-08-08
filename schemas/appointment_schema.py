@@ -3,7 +3,7 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 
-status_choices  = ["pending", "completed", "canceled"]
+status_choices = ["pending", "completed", "canceled"]
 
 
 class Appointment(BaseModel):
@@ -12,7 +12,7 @@ class Appointment(BaseModel):
     expiration_date: datetime
     issue: str = None
     status: str = Field(default="pending")
-    price: float = 0
+    price: float = Field(default=200.0)
 
     class Config:
         from_attributes = True
@@ -20,13 +20,9 @@ class Appointment(BaseModel):
     @field_validator("status", mode="after")
     def status_validator(cls, status: str):
         if status in status_choices:
-            return status  
-        if status == "":
-            return None
+            return status
         
     @field_validator("price", mode="after")
     def price_validator(cls, price: float):
         if isinstance(price, float):
-            return price       
-        if price == "":
-            return None
+            return price

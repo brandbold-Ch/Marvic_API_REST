@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Text, String, UUID, Date, ForeignKey, Float
+from sqlalchemy import Column, Text, String, UUID, Date, ForeignKey, Float, DateTime
 from utils.config_orm import Base
 from datetime import datetime
 
@@ -7,7 +7,7 @@ class AppointmentModel(Base):
 
     __tablename__ = "appointment"
     id = Column(UUID, primary_key=True)
-    creation_date = Column(Date, default=datetime.now())
+    creation_date = Column(Date, nullable=False)
     expiration_date = Column(Date, nullable=False)
     pet_id = Column(UUID, ForeignKey("pet.id"), nullable=False)
     user_id = Column(UUID, ForeignKey("user.id"), nullable=False)

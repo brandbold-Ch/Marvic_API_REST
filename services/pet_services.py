@@ -1,153 +1,88 @@
+from decorators.entity_decorators import check_user, check_pet_context
+from decorators.error_decorators import exceptions_handler
 from utils.image_tools import upload_image, delete_image
-from sqlalchemy.exc import DataError, SQLAlchemyError
-from utils.config_orm import Base, engine, Session
-from services.mw_services import MWServices
+from sqlalchemy.orm.session import Session
 from models.image_model import ImageModel
-from sqlalchemy.sql import update, delete
+from utils.config_orm import Base, engine
 from models.pet_model import PetModel
-from sqlalchemy.orm import session
 from sqlalchemy import and_
 from uuid import uuid4
-from errors.handler_exceptions import (
-    handle_sqlalchemy_error,
-    handle_do_not_exists,
-    handle_data_error 
-)
 
 
 class PetServices:
 
-    def __init__(self) -> None:
+    def __init__(self, session: Session) -> None:
         Base.metadata.create_all(engine)
-        self.session: session.Session = Session()
-        self.mw = MWServices()
+        self.session = session
 
+    @check_user
+    @exceptions_handler
     async def create_pet(self, user_id: str, pet_data: dict) -> dict:
-        success: bool = False
-        image_path: str = None
+        image_data = pet_data.pop("image")
 
-        try:
-            self.mw.get_user(user_id)
-            pet_data["user_id"] = user_id
-            image_data = pet_data.pop("image")
-                        
-            if image_data is not None:
-                image_path = await upload_image(image_data)
-                self.session.add(ImageModel(id=uuid4(), image=image_path, pet_id=pet_data["id"]))
+        pet_create = PetModel(**pet_data, user_id=user_id)
+        self.session.add(pet_create)
+        self.session.commit()
 
-            pet = PetModel(**pet_data)
-            self.session.add(pet)
+        if image_data is not None:
+            image_path = await upload_image(image_data)
+            self.session.add(ImageModel(id=uuid4(), image=image_path, pet_id=pet_create.id))
             self.session.commit()
-            success = True
 
-            return pet.to_dict()
+        return pet_create.to_dict()
 
-        except DataError:
-            self.session.rollback()
-            handle_data_error()
-
-        except SQLAlchemyError:
-            self.session.rollback()
-            handle_sqlalchemy_error()
-  
-        finally:
-            if success is False and image_path is not None:
-                await delete_image(image_path)
-            self.session.close()          
-
+    @check_user
+    @exceptions_handler
     async def get_pets(self, user_id: str) -> list[dict]:
-        try:
-            self.mw.get_user(user_id)
+        pets = (self.session.query(PetModel).where(
+            user_id == PetModel.user_id
+        ).all())
 
-            pets = (self.session.query(PetModel).filter(and_(*[
-                PetModel.user_id == user_id
-            ])).all())
-            
-            return [pet.to_dict() for pet in pets]
+        return [pet.to_dict() for pet in pets]
 
-        except DataError:
-            handle_data_error()
-
-        except SQLAlchemyError:
-            handle_sqlalchemy_error()
-
-        finally:
-            self.session.close()
-
+    @check_user
+    @check_pet_context
+    @exceptions_handler
     async def get_pet(self, user_id: str, pet_id: str) -> dict:
-        try:
-            self.mw.get_user(user_id)
+        pet_data: PetModel | None = self.session.query(PetModel).filter(
+            and_(*[PetModel.user_id == user_id, PetModel.id == pet_id])
+        ).first()
 
-            pet_data = self.session.query(PetModel).filter(
-                and_(*[PetModel.user_id == user_id, PetModel.id == pet_id])
-            ).first()
+        return pet_data.to_dict()
 
-            if pet_data:
-                return pet_data.to_dict()
-            else:
-                handle_do_not_exists("pet")
+    @check_user
+    @check_pet_context
+    @exceptions_handler
+    async def update_pet(self, user_id: str, pet_id: str, pet_data: dict) -> dict:
+        del pet_data["id"]
+        image_data = pet_data.pop("image")
 
-        except DataError:
-            handle_data_error()
+        pet_update: PetModel | None = self.session.query(PetModel).where(and_(*[
+            PetModel.user_id == user_id,
+            PetModel.id == pet_id
+        ])).first()
+        pet_update.update_fields(**pet_data)
 
-        except SQLAlchemyError:
-            handle_sqlalchemy_error()
+        self.session.add(pet_update)
+        self.session.commit()
 
-        finally:
-            self.session.close()
-
-    async def update_pet(self, user_id: str, pet_id: str, pet_data: dict) -> None:
-        try:
-            await self.get_pet(user_id, pet_id)
-            del pet_data["id"]
-
-            stmt = (update(PetModel)
-                    .where(and_(*[PetModel.user_id == user_id, PetModel.id == pet_id]))
-                    .values(**pet_data))
-            self.session.execute(stmt)
+        if image_data is not None and pet_update.get_image() is None:
+            image_path = await upload_image(image_data)
+            self.session.add(ImageModel(id=uuid4(), image=image_path, pet_id=pet_update.id))
             self.session.commit()
 
-        except DataError:
-            self.session.rollback()
-            handle_data_error()
+        return pet_update.to_dict()
 
-        except SQLAlchemyError:
-            self.session.rollback()
-            handle_sqlalchemy_error()
-
-        finally:
-            self.session.close()
-
+    @check_user
+    @check_pet_context
+    @exceptions_handler
     async def delete_pet(self, user_id: str, pet_id: str) -> None:
-        success: bool = False
-        pet_data = None
+        pet_delete: PetModel | None = self.session.query(PetModel).where(and_(*[
+            PetModel.user_id == user_id,
+            PetModel.id == pet_id
+        ])).first()
+        self.session.delete(pet_delete)
+        self.session.commit()
 
-        try:
-            pet_data = await self.get_pet(user_id, pet_id)
-
-            stmt_pet = (
-                delete(PetModel)
-                .where(and_(*[
-                    PetModel.user_id == user_id,
-                    PetModel.id == pet_id
-                ]))
-            )
-            stmt_image = delete(ImageModel).where(and_(*[ImageModel.pet_id == pet_id]))
-            self.session.execute(stmt_pet)
-            self.session.execute(stmt_image)
-            self.session.commit()          
-            success = True     
-
-        except DataError:
-            self.session.rollback()
-            handle_data_error()
-
-        except SQLAlchemyError as err:
-            print(err)
-            self.session.rollback()
-            handle_sqlalchemy_error()
-
-        finally:
-            if success and pet_data and pet_data["appearance"]["image"]:
-                await delete_image(pet_data["appearance"]["image"])
-            self.session.close()
+        if pet_delete.get_image() is not None:
+            delete_image(pet_delete.get_image())

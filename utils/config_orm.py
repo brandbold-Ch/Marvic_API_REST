@@ -19,5 +19,5 @@ url = URL.create(
 )
 
 engine = create_engine(url)
-Session: sessionmaker = sessionmaker(bind=engine)
+SessionLocal: sessionmaker = sessionmaker(bind=engine)
 Base: DeclarativeMeta = declarative_base()
