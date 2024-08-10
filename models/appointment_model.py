@@ -1,6 +1,5 @@
-from sqlalchemy import Column, Text, String, UUID, Date, ForeignKey, Float, DateTime
+from sqlalchemy import Column, Text, String, UUID, Date, ForeignKey, Float
 from utils.config_orm import Base
-from datetime import datetime
 
 
 class AppointmentModel(Base):

@@ -1,0 +1,35 @@
+version: "2.20.3"
+
+services:
+  backend: 
+    image: backend-marvic
+    build: .
+    depends_on:
+      - db
+    container_name: marvic-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/Marvic_API_REST
+    environment:
+      - URL=postgresql://postgres:mypostgres@db:5432/marvic
+      - DATABASE=postgres
+      - USER=postgres
+      - PASSWORD=mypostgres
+      - HOST=db
+      - PORT=5432
+
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      - POSTGRES_PASSWORD=mypostgres
+    expose:
+      - 5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
