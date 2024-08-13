@@ -7,9 +7,9 @@ class UserModel(Base):
 
     __tablename__ = "user"
     id = Column(UUID, primary_key=True)
-    name = Column(String(50), nullable=False)
-    lastname = Column(String(50), nullable=False)
-    phone_number = Column(String(10), nullable=False)
+    name = Column(String(50), nullable=True)
+    lastname = Column(String(50), nullable=True)
+    phone_number = Column(String(10), nullable=True)
     auth = relationship("AuthModel", uselist=False, cascade="all, delete")
     pets = relationship("PetModel", cascade="all, delete-orphan")
 

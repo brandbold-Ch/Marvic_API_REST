@@ -3,7 +3,6 @@ from decorators.error_decorators import exceptions_handler
 from utils.image_tools import upload_image, delete_image
 from sqlalchemy.orm.session import Session
 from models.image_model import ImageModel
-from utils.config_orm import Base, engine
 from models.pet_model import PetModel
 from sqlalchemy import and_
 from uuid import uuid4
@@ -12,7 +11,6 @@ from uuid import uuid4
 class PetServices:
 
     def __init__(self, session: Session) -> None:
-        Base.metadata.create_all(engine)
         self.session = session
 
     @check_user
@@ -85,4 +83,5 @@ class PetServices:
         self.session.commit()
 
         if pet_delete.get_image() is not None:
-            delete_image(pet_delete.get_image())
+            image = pet_delete.get_image().split("/")
+            delete_image(image[-1])

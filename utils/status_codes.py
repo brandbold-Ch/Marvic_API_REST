@@ -65,7 +65,7 @@ status_codes = {
     "NETWORK_AUTHENTICATION_REQUIRED": 511
 }
 
-errors_codes = {
+error_codes = {
     "JSON_FORMAT_INVALID": 1000,
     "JSON_NESTED_FORMAT_INVALID": 1001,
     "JSON_INVALID_DATA_TYPE": 1003,

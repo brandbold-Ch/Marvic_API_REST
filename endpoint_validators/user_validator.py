@@ -2,21 +2,45 @@ from errors.exception_classes import ErrorInFields
 from schemas.user_schema import User
 from schemas.auth_schema import Auth
 from pydantic import ValidationError
+from typing import Annotated
+from fastapi import Body, Path
 
 
-def validate_create_user_data(request_data: dict[dict, dict]) -> tuple[dict, dict]:
+def validate_create(
+        name: Annotated[str, Body(...)],
+        lastname: Annotated[str, Body(...)],
+        phone_number: Annotated[str, Body(...)],
+        email: Annotated[str, Body(...)],
+        password: Annotated[str, Body(...)]
+) -> tuple[dict, dict]:
     try:
         return (
-            User(**request_data["user_data"]).model_dump(), 
-            Auth(**request_data["auth_data"], role="USER").model_dump()
+            User(
+                name=name,
+                lastname=lastname,
+                phone_number=phone_number
+            ).model_dump(),
+            Auth(
+                email=email,
+                password=password,
+                role="USER"
+            ).model_dump()
         )
-    except ValidationError as error:
-        raise ErrorInFields(error)
+    except ValidationError as e:
+        raise ErrorInFields(e)
 
 
-def validate_update_user_data(request_data: dict) -> dict:
+def validate_update(
+        name: Annotated[str, Body(...)],
+        lastname: Annotated[str, Body(...)],
+        phone_number: Annotated[str, Body(...)]
+) -> dict:
     try:
-        return User(**request_data).model_dump()
+        return User(
+            name=name,
+            lastname=lastname,
+            phone_number=phone_number
+        ).model_dump()
 
-    except ValidationError as error:
-        raise ErrorInFields(error)
+    except ValidationError as e:
+        raise ErrorInFields(e)

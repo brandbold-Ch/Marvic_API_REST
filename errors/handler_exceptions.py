@@ -1,7 +1,7 @@
 from errors.exception_classes import (
     DoesNotExistInDatabase,
-    DuplicatedInDatabase, 
-    InvalidUUID
+    DuplicatedInDatabase,
+    InvalidId
 )
 
 
@@ -10,7 +10,7 @@ def handle_integrity_error() -> None:
 
 
 def handle_data_error() -> None:
-    raise InvalidUUID("UUID with invalid format 🆔") 
+    raise InvalidId("UUID with invalid format 🆔")
 
 
 def handle_do_not_exists(model_name: str) -> None:

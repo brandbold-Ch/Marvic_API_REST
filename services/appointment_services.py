@@ -1,7 +1,6 @@
 from decorators.entity_decorators import check_user, check_pet_context, check_appointment_context
-from models.appointment_model import AppointmentModel
 from decorators.error_decorators import exceptions_handler
-from utils.config_orm import Base, engine
+from models.appointment_model import AppointmentModel
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import delete
 from sqlalchemy import and_
@@ -10,7 +9,6 @@ from sqlalchemy import and_
 class AppointmentServices:
 
     def __init__(self, session: Session):
-        Base.metadata.create_all(engine)
         self.session = session
 
     @check_user

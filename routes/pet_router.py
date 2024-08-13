@@ -1,20 +1,20 @@
-from errors.exception_classes import ErrorInFields, DoesNotExistInDatabase, InvalidUUID
+from errors.exception_classes import ErrorInFields, DoesNotExistInDatabase, InvalidId
 from endpoint_validators.pet_validator import validate_create_pet_data
 from fastapi import APIRouter, Path, Form, UploadFile, File, status
 from fastapi.requests import Request
 from errors.http_error_handler import HandlerResponses
 from controllers.pet_controller import PetController
-from utils.status_codes import errors_codes
+from utils.status_codes import error_codes
 from fastapi.responses import JSONResponse
 from typing import Any, Annotated
 from utils.config_orm import SessionLocal
 
 
-pets = APIRouter()
+pet_routes = APIRouter()
 pet_controller = PetController(SessionLocal())
 
 
-@pets.post("/")
+@pet_routes.post("/")
 async def create_pet(
         request: Request,
         user_id: Annotated[str, Path(max_length=36)],
@@ -50,29 +50,29 @@ async def create_pet(
     except ErrorInFields as error:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content=HandlerResponses.bad_request(str(error), errors_codes["ERROR_DATA_VALIDATION"])
+            content=HandlerResponses.bad_request(str(error), error_codes["ERROR_DATA_VALIDATION"])
         )
 
-    except InvalidUUID as error:
+    except InvalidId as error:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
+            content=HandlerResponses.bad_request(str(error), error_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
+            content=HandlerResponses.not_found(str(error), error_codes["DB_NOT_FOUND"])
         )
 
     except Exception as error:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
+            content=HandlerResponses.internal_server_error(str(error), error_codes["SERVER_UNKNOWN_ERROR"])
         )
 
 
-@pets.get("/")
+@pet_routes.get("/")
 async def get_pets(request: Request, user_id: Annotated[str, Path(max_length=36)]) -> list[dict] | Any:
     try:
         return JSONResponse(
@@ -80,26 +80,26 @@ async def get_pets(request: Request, user_id: Annotated[str, Path(max_length=36)
             content=await pet_controller.get_pets(user_id)
         )
 
-    except InvalidUUID as error:
+    except InvalidId as error:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
+            content=HandlerResponses.bad_request(str(error), error_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
+            content=HandlerResponses.not_found(str(error), error_codes["DB_NOT_FOUND"])
         )
 
     except Exception as error:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
+            content=HandlerResponses.internal_server_error(str(error), error_codes["SERVER_UNKNOWN_ERROR"])
         )
 
 
-@pets.get("/{pet_id}")
+@pet_routes.get("/{pet_id}")
 async def get_pet(
         request: Request,
         user_id: Annotated[str, Path(max_length=36)],
@@ -111,26 +111,26 @@ async def get_pet(
             content=await pet_controller.get_pet(user_id, pet_id)
         )
 
-    except InvalidUUID as error:
+    except InvalidId as error:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
+            content=HandlerResponses.bad_request(str(error), error_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
+            content=HandlerResponses.not_found(str(error), error_codes["DB_NOT_FOUND"])
         )
 
     except Exception as error:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
+            content=HandlerResponses.internal_server_error(str(error), error_codes["SERVER_UNKNOWN_ERROR"])
         )
 
 
-@pets.put("/{pet_id}")
+@pet_routes.put("/{pet_id}")
 async def update_pet(
         request: Request,
         user_id: Annotated[str, Path(max_length=36)],
@@ -170,29 +170,29 @@ async def update_pet(
     except ErrorInFields as error:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content=HandlerResponses.bad_request(str(error), errors_codes["ERROR_DATA_VALIDATION"])
+            content=HandlerResponses.bad_request(str(error), error_codes["ERROR_DATA_VALIDATION"])
         )
 
-    except InvalidUUID as error:
+    except InvalidId as error:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
+            content=HandlerResponses.bad_request(str(error), error_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
+            content=HandlerResponses.not_found(str(error), error_codes["DB_NOT_FOUND"])
         )
 
     except Exception as error:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
+            content=HandlerResponses.internal_server_error(str(error), error_codes["SERVER_UNKNOWN_ERROR"])
         )
 
 
-@pets.delete("/{pet_id}")
+@pet_routes.delete("/{pet_id}")
 async def delete_pet(
         request: Request,
         user_id: Annotated[str, Path(max_length=36)],
@@ -202,20 +202,20 @@ async def delete_pet(
         await pet_controller.delete_pet(user_id, pet_id)
         return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
 
-    except InvalidUUID as error:
+    except InvalidId as error:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
+            content=HandlerResponses.bad_request(str(error), error_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
+            content=HandlerResponses.not_found(str(error), error_codes["DB_NOT_FOUND"])
         )
 
     except Exception as error:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
+            content=HandlerResponses.internal_server_error(str(error), error_codes["SERVER_UNKNOWN_ERROR"])
         )

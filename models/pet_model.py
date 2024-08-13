@@ -1,6 +1,9 @@
 from sqlalchemy import Column, Boolean, Float, String, UUID, ForeignKey
+from models.image_model import ImageModel
 from sqlalchemy.orm import relationship
 from utils.config_orm import Base
+from dotenv import load_dotenv
+import os
 
 
 class PetModel(Base):
@@ -9,8 +12,8 @@ class PetModel(Base):
     id = Column(UUID, primary_key=True)
     user_id = Column(UUID, ForeignKey("user.id"), nullable=False)
     name = Column(String(25), nullable=True)
-    specie = Column(String(5), nullable=False)
-    gender = Column(String(6), nullable=False)
+    specie = Column(String(5), nullable=True)
+    gender = Column(String(6), nullable=True)
     size = Column(String(7), nullable=True)
     age = Column(String(20), nullable=True)
     breed = Column(String(60), nullable=True)
@@ -25,10 +28,11 @@ class PetModel(Base):
 
     def get_image(self) -> str | None:
         if self.image is not None:
-            return self.image.image
+            load_dotenv()
+            return f"{os.getenv('GET_IMAGE_URL')}{self.image.image}"
         return None
 
-    def update_fields(self, **kwargs):
+    def update_fields(self, **kwargs) -> None:
         for field, value in kwargs.items():
             setattr(self, field, value)
 

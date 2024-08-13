@@ -1,4 +1,4 @@
-from utils.config_orm import Base, engine, SessionLocal
+from utils.config_orm import SessionLocal
 from models.price_model import PriceModel
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.exc import DataError
@@ -13,7 +13,6 @@ from errors.handler_exceptions import (
 class PriceService:
 
     def __init__(self) -> None:
-        Base.metadata.create_all(engine)
         self.session = SessionLocal()
 
     def get_price(self, price_id: str) -> dict:
@@ -42,7 +41,6 @@ class PriceService:
                    .values(prices=price_data))
            self.session.execute(stmt)
            self.session.commit()
-        
     
         except SQLAlchemyError:
             self.session.rollback()

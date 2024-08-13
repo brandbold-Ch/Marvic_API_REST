@@ -9,7 +9,7 @@ class User(BaseModel):
     phone_number: str = Field(max_length=10, min_length=10)
 
     @field_validator("phone_number", mode="after")
-    def phone_number_validator(cls, pnb: str) -> str:
-        if pnb.isdigit():
-            return pnb
+    def phone_number_validator(cls, passwd: str) -> str:
+        if passwd.isdigit():
+            return passwd
         raise ValueError("Must be a numeric string")

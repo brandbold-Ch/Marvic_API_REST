@@ -2,7 +2,6 @@ from pydantic import BaseModel, field_validator, Field
 from typing import Optional, Union
 from fastapi import UploadFile
 from uuid import uuid4, UUID
-from enum import Enum
 
 specie_choices: list = ["Gato", "Perro", "Otro"]
 gender_choices: list = ["Macho", "Hembra"]
@@ -47,34 +46,4 @@ class Pet(BaseModel):
         if size == "" or size is None:
             return None
         raise ValueError(f"Must be one of the following values {size_choices}")
-
-    @field_validator("age", mode="after")
-    def age_validator(cls, age: str):
-        if age == "":
-            return None
-        return age
-
-    @field_validator("breed", mode="after")
-    def breed_validator(cls, breed: str):
-        if breed == "":
-            return None
-        return breed
-
-    @field_validator("weight", mode="after")
-    def weight_validator(cls, weight: str):
-        if weight == "":
-            return None
-        return weight
-
-    @field_validator("is_live", mode="after")
-    def is_live_validator(cls, is_live: str):
-        if is_live == "":
-            return None
-        return is_live
-
-    @field_validator("image", mode="after")
-    def image_validator(cls, image: UploadFile):
-        if image == "":
-            return None
-        return image
     

@@ -1,10 +1,10 @@
-from errors.exception_classes import ErrorInFields, InvalidUUID, DoesNotExistInDatabase
+from errors.exception_classes import ErrorInFields, InvalidId, DoesNotExistInDatabase
 from endpoint_validators.appointment_validator import validate_create_appointment_data
 from controllers.appointment_controller import AppointmentControllers
 from errors.http_error_handler import HandlerResponses
 from fastapi.requests import Request
 from fastapi.encoders import jsonable_encoder
-from utils.status_codes import errors_codes
+from utils.status_codes import error_codes
 from fastapi.responses import JSONResponse
 from utils.config_orm import SessionLocal
 from fastapi import APIRouter, Path
@@ -13,11 +13,11 @@ from datetime import datetime
 from fastapi import Body
 
 
-appointments = APIRouter()
+appointment_routes = APIRouter()
 appointment_controller = AppointmentControllers(SessionLocal())
 
 
-@appointments.post("/")
+@appointment_routes.post("/")
 async def create_appointment(
         request: Request,
         user_id: Annotated[str, Path(max_length=36)],
@@ -47,29 +47,29 @@ async def create_appointment(
     except ErrorInFields as error:
         return JSONResponse(
             status_code=400,
-            content=HandlerResponses.bad_request(str(error), errors_codes["JSON_INVALID_DATA_TYPE"])
+            content=HandlerResponses.bad_request(str(error), error_codes["JSON_INVALID_DATA_TYPE"])
         )
     
-    except InvalidUUID as error:
+    except InvalidId as error:
         return JSONResponse(
             status_code=400,
-            content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
+            content=HandlerResponses.bad_request(str(error), error_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
             status_code=404,
-            content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
+            content=HandlerResponses.not_found(str(error), error_codes["DB_NOT_FOUND"])
         )
 
     except Exception as error:
         return JSONResponse(
             status_code=500,
-            content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
+            content=HandlerResponses.internal_server_error(str(error), error_codes["SERVER_UNKNOWN_ERROR"])
         )
 
 
-@appointments.get("/")
+@appointment_routes.get("/")
 async def get_appointments(
         request: Request,
         pet_id: Annotated[str, Path(max_length=36)],
@@ -78,26 +78,26 @@ async def get_appointments(
     try:
         return appointment_controller.get_appointments(user_id, pet_id)
 
-    except InvalidUUID as error:
+    except InvalidId as error:
         return JSONResponse(
             status_code=400,
-            content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
+            content=HandlerResponses.bad_request(str(error), error_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
             status_code=404,
-            content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
+            content=HandlerResponses.not_found(str(error), error_codes["DB_NOT_FOUND"])
         )
 
     except Exception as error:
         return JSONResponse(
             status_code=500,
-            content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
+            content=HandlerResponses.internal_server_error(str(error), error_codes["SERVER_UNKNOWN_ERROR"])
         )
 
 
-@appointments.get("/{appointment_id}")
+@appointment_routes.get("/{appointment_id}")
 async def get_appointment(
         request: Request,
         pet_id: Annotated[str, Path(max_length=36)],
@@ -107,26 +107,26 @@ async def get_appointment(
     try:
         return appointment_controller.get_appointment(user_id, pet_id, appointment_id)
 
-    except InvalidUUID as error:
+    except InvalidId as error:
         return JSONResponse(
             status_code=400,
-            content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
+            content=HandlerResponses.bad_request(str(error), error_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
             status_code=404,
-            content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
+            content=HandlerResponses.not_found(str(error), error_codes["DB_NOT_FOUND"])
         )
 
     except Exception as error:
         return JSONResponse(
             status_code=500,
-            content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
+            content=HandlerResponses.internal_server_error(str(error), error_codes["SERVER_UNKNOWN_ERROR"])
         )
 
 
-@appointments.delete("/{appointment_id}")
+@appointment_routes.delete("/{appointment_id}")
 async def delete_appointment(
         request: Request,
         pet_id: Annotated[str, Path(max_length=36)],
@@ -137,20 +137,20 @@ async def delete_appointment(
         appointment_controller.delete_appointment(user_id, pet_id, appointment_id)
         return JSONResponse(status_code=204, content=None)
 
-    except InvalidUUID as error:
+    except InvalidId as error:
         return JSONResponse(
             status_code=400,
-            content=HandlerResponses.bad_request(str(error), errors_codes["DB_INVALID_FORMAT_ID"])
+            content=HandlerResponses.bad_request(str(error), error_codes["DB_INVALID_FORMAT_ID"])
         )
 
     except DoesNotExistInDatabase as error:
         return JSONResponse(
             status_code=404,
-            content=HandlerResponses.not_found(str(error), errors_codes["DB_NOT_FOUND"])
+            content=HandlerResponses.not_found(str(error), error_codes["DB_NOT_FOUND"])
         )
 
     except Exception as error:
         return JSONResponse(
             status_code=500,
-            content=HandlerResponses.internal_server_error(str(error), errors_codes["SERVER_UNKNOWN_ERROR"])
+            content=HandlerResponses.internal_server_error(str(error), error_codes["SERVER_UNKNOWN_ERROR"])
         )

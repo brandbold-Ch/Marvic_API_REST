@@ -1,4 +1,4 @@
-from errors.handler_exceptions import handle_do_not_exists
+from errors.exception_classes import DoesNotExistInDatabase
 from models.appointment_model import AppointmentModel
 from sqlalchemy.orm.session import Session
 from utils.config_orm import SessionLocal
@@ -13,7 +13,7 @@ session: Session = SessionLocal()
 def check_user(func: Callable) -> Callable:
     def wrapper(*args):
         if session.get(UserModel, args[1]) is None:
-            handle_do_not_exists("user")
+            raise DoesNotExistInDatabase("The user does not exist 🤦‍♂️")
         return func(*args)
     return wrapper
 
@@ -26,15 +26,7 @@ def check_pet_context(func: Callable) -> Callable:
         ])).first()
 
         if pet is None:
-            handle_do_not_exists("pet")
-        return func(*args)
-    return wrapper
-
-
-def check_pet_only(func: Callable) -> Callable:
-    def wrapper(*args):
-        if session.get(PetModel, args[1]) is None:
-            handle_do_not_exists("pet")
+            raise DoesNotExistInDatabase("The pet does not exist 🐶")
         return func(*args)
     return wrapper
 
@@ -48,6 +40,6 @@ def check_appointment_context(func: Callable) -> Callable:
         ])).first()
 
         if appointment is None:
-            handle_do_not_exists("appointment")
+            raise DoesNotExistInDatabase("The appointment does not exist 📑")
         return func(*args)
     return wrapper

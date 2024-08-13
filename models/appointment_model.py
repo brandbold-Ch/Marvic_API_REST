@@ -12,8 +12,8 @@ class AppointmentModel(Base):
     user_id = Column(UUID, ForeignKey("user.id"), nullable=False)
     issue = Column(Text, nullable=True)
     status = Column(String(10), nullable=False)
-    price = Column(Float, nullable=False)
-    
+    price = Column(Float, nullable=True)
+
     def to_dict(self) -> dict:
         return {
             "id": str(self.id),

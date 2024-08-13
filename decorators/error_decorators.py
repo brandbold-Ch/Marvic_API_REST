@@ -1,9 +1,5 @@
 from sqlalchemy.exc import IntegrityError, DataError, SQLAlchemyError
-from errors.handler_exceptions import (
-    handle_sqlalchemy_error, 
-    handle_integrity_error,
-    handle_data_error
-)
+from errors.exception_classes import InvalidId, DuplicatedInDatabase, UnknownError
 from typing import Callable
 
     
@@ -12,17 +8,17 @@ def exceptions_handler(func: Callable):
         try:
             return func(self, *args)
 
-        except DataError:
+        except DataError as e:
             self.session.rollback()
-            handle_data_error()
+            raise InvalidId() from e
 
-        except IntegrityError:
+        except IntegrityError as e:
             self.session.rollback()
-            handle_integrity_error()
+            raise DuplicatedInDatabase() from e
 
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
             self.session.rollback()
-            handle_sqlalchemy_error()
+            raise UnknownError() from e
 
         finally:
             self.session.close()
