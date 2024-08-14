@@ -15,8 +15,8 @@ async def upload_image(image_data: UploadFile) -> str:
             webp_stream = BytesIO()
             image.save(webp_stream, format="WEBP")
             webp_stream.seek(0)
-            
-            file_path = os.path.join("static/images", f"{new_name}.webp")
+
+            file_path = os.path.join("static", "images", f"{new_name}.webp")
             with open(file_path, "wb") as webp_file:
                 webp_file.write(webp_stream.read())
                 
