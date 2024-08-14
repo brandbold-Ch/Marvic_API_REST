@@ -1,3 +1,5 @@
+import os.path
+
 from routes.appointment_route import appointment_routes
 from starlette.responses import FileResponse
 from routes.user_router import user_routes

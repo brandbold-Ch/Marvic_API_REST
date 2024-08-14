@@ -4,6 +4,9 @@ from uuid import uuid4
 from PIL import Image
 import os
 
+base_dir = os.path.dirname(os.path.abspath(__file__))
+static_dir = os.path.join(base_dir, "static")
+
 
 async def upload_image(image_data: UploadFile) -> str:
     try:
@@ -16,7 +19,7 @@ async def upload_image(image_data: UploadFile) -> str:
             image.save(webp_stream, format="WEBP")
             webp_stream.seek(0)
 
-            file_path = os.path.join("static", "images", f"{new_name}.webp")
+            file_path = os.path.join(static_dir, "images", f"{new_name}.webp")
             with open(file_path, "wb") as webp_file:
                 webp_file.write(webp_stream.read())
                 
@@ -27,7 +30,7 @@ async def upload_image(image_data: UploadFile) -> str:
     
 
 def delete_image(image_path: str) -> None:
-    file_path = os.path.join("static", "images", image_path)
+    file_path = os.path.join(static_dir, "images", image_path)
     
     try:
         os.remove(file_path)
