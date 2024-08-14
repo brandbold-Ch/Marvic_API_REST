@@ -3,7 +3,7 @@ from schemas.user_schema import User
 from schemas.auth_schema import Auth
 from pydantic import ValidationError
 from typing import Annotated
-from fastapi import Body, Path
+from fastapi import Body
 
 
 def validate_create(

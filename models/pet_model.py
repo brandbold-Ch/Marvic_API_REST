@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Boolean, Float, String, UUID, ForeignKey
+from sqlalchemy import Column, Float, String, UUID, ForeignKey
 from models.image_model import ImageModel
 from sqlalchemy.orm import relationship
 from utils.config_orm import Base
@@ -18,7 +18,10 @@ class PetModel(Base):
     age = Column(String(20), nullable=True)
     breed = Column(String(60), nullable=True)
     weight = Column(Float, nullable=True)
-    is_live = Column(Boolean, default=True)
+    appointments = relationship(
+        "AppointmentModel",
+        cascade="all, delete-orphan"
+    )
     image = relationship(
         "ImageModel",
         uselist=False,
@@ -43,16 +46,13 @@ class PetModel(Base):
             "basic_info": {
                 "name": self.name,
                 "specie": self.specie,
-                "breed": self.breed
+                "breed": self.breed,
+                "age": self.age
             },
             "appearance": {
                 "gender": self.gender,
                 "size": self.size,
                 "weight": self.weight,
                 "image": self.get_image()
-            },
-            "additional_details": {
-                "age": self.age,
-                "is_live": self.is_live
             }
         }

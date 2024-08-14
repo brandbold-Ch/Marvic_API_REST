@@ -1,4 +1,3 @@
-from decorators.entity_decorators import check_user, check_pet_context
 from decorators.error_decorators import exceptions_handler
 from utils.image_tools import upload_image, delete_image
 from sqlalchemy.orm.session import Session
@@ -13,8 +12,7 @@ class PetServices:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    @check_user
-    @exceptions_handler
+    @exceptions_handler(verify_user=True)
     async def create_pet(self, user_id: str, pet_data: dict) -> dict:
         image_data = pet_data.pop("image")
 
@@ -29,28 +27,23 @@ class PetServices:
 
         return pet_create.to_dict()
 
-    @check_user
-    @exceptions_handler
-    async def get_pets(self, user_id: str) -> list[dict]:
+    @exceptions_handler(verify_user=True)
+    def get_pets(self, user_id: str) -> list[dict]:
         pets = (self.session.query(PetModel).where(
             user_id == PetModel.user_id
         ).all())
 
         return [pet.to_dict() for pet in pets]
 
-    @check_user
-    @check_pet_context
-    @exceptions_handler
-    async def get_pet(self, user_id: str, pet_id: str) -> dict:
+    @exceptions_handler(verify_pet=True)
+    def get_pet(self, user_id: str, pet_id: str) -> dict:
         pet_data: PetModel | None = self.session.query(PetModel).filter(
             and_(*[PetModel.user_id == user_id, PetModel.id == pet_id])
         ).first()
 
         return pet_data.to_dict()
 
-    @check_user
-    @check_pet_context
-    @exceptions_handler
+    @exceptions_handler(verify_pet=True)
     async def update_pet(self, user_id: str, pet_id: str, pet_data: dict) -> dict:
         del pet_data["id"]
         image_data = pet_data.pop("image")
@@ -71,10 +64,8 @@ class PetServices:
 
         return pet_update.to_dict()
 
-    @check_user
-    @check_pet_context
-    @exceptions_handler
-    async def delete_pet(self, user_id: str, pet_id: str) -> None:
+    @exceptions_handler(verify_pet=True)
+    def delete_pet(self, user_id: str, pet_id: str) -> None:
         pet_delete: PetModel | None = self.session.query(PetModel).where(and_(*[
             PetModel.user_id == user_id,
             PetModel.id == pet_id

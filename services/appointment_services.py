@@ -11,9 +11,7 @@ class AppointmentServices:
     def __init__(self, session: Session):
         self.session = session
 
-    @check_user
-    @check_pet_context
-    @exceptions_handler
+    @exceptions_handler(verify_pet=True)
     def create_appointment(self, user_id: str, pet_id: str, appointment_data: dict) -> dict:
         appointment_create = AppointmentModel(**appointment_data, user_id=user_id, pet_id=pet_id)
         self.session.add(appointment_create)
@@ -21,10 +19,7 @@ class AppointmentServices:
 
         return appointment_create.to_dict()
 
-    @check_user
-    @check_pet_context
-    @check_appointment_context
-    @exceptions_handler
+    @exceptions_handler(verify_appointment=True)
     def get_appointment(self, user_id: str, pet_id: str, appointment_id: str) -> dict:
         appointment_data: AppointmentModel | None = self.session.query(AppointmentModel).where(and_(*[
             AppointmentModel.user_id == user_id,
@@ -34,9 +29,7 @@ class AppointmentServices:
 
         return appointment_data.to_dict()
 
-    @check_user
-    @check_pet_context
-    @exceptions_handler
+    @exceptions_handler(verify_pet=True)
     def get_appointments(self, user_id: str, pet_id: str) -> list[dict]:
         appointments = self.session.query(AppointmentModel).where(and_(*[
             AppointmentModel.user_id == user_id,
@@ -45,10 +38,7 @@ class AppointmentServices:
 
         return [appointment.to_dict() for appointment in appointments]
 
-    @check_user
-    @check_pet_context
-    @check_appointment_context
-    @exceptions_handler
+    @exceptions_handler(verify_appointment=True)
     def delete_appointment(self, user_id: str, pet_id: str, appointment_id: str) -> None:
         stmt = delete(AppointmentModel).where(and_(*[
             AppointmentModel.user_id == user_id,

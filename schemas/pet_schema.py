@@ -17,7 +17,6 @@ class Pet(BaseModel):
     age: Optional[str] = None
     breed: Optional[str] = None
     weight: Union[Optional[float], Optional[str]] = None
-    is_live: Optional[bool] = Field(default=True)
     image: Union[Optional[str], Optional[UploadFile]] = None
 
     class Config:
@@ -46,4 +45,3 @@ class Pet(BaseModel):
         if size == "" or size is None:
             return None
         raise ValueError(f"Must be one of the following values {size_choices}")
-    
