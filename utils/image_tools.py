@@ -1,4 +1,5 @@
 from errors.exception_classes import InvalidImageType, FileNotFound
+from route_resolver import static_files
 from fastapi import UploadFile
 from io import BytesIO
 from uuid import uuid4
@@ -17,7 +18,7 @@ async def upload_image(image_data: UploadFile) -> str:
             image.save(webp_stream, format="WEBP")
             webp_stream.seek(0)
 
-            file_path = os.path.join("static", "images", f"{new_name}.webp")
+            file_path = static_files(f"{new_name}.webp")
             with open(file_path, "wb") as webp_file:
                 webp_file.write(webp_stream.read())
                 

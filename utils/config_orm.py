@@ -18,6 +18,6 @@ url = URL.create(
     port=os.getenv("PORT")
 )
 
-engine = create_engine(os.getenv("URL"))
+engine = create_engine(url)
 SessionLocal: sessionmaker = sessionmaker(bind=engine)
 Base: DeclarativeMeta = declarative_base()
