@@ -76,3 +76,25 @@ class UnknownError(ServerBaseException):
         self.error_code = error_codes["SERVER_UNKNOWN_ERROR"]
         self.status_code = status_codes["INTERNAL_SERVER_ERROR"]
         self.http_argument = "Internal Server Error 💀"
+
+
+class InvalidImageType(ServerBaseException):
+    def __init__(self, message="The image type is not valid 📸", detail=None) -> None:
+        super().__init__(message)
+        self.add_note(f"""
+            Hubo un error al procesar la imagen. {detail}
+        """)
+        self.error_code = error_codes["ERROR_DATA_VALIDATION"]
+        self.status_code = status_codes["UNSUPPORTED_MEDIA_TYPE"]
+        self.http_argument = "Unsupported Media Type 💾"
+
+
+class FileNotFound(ServerBaseException):
+    def __init__(self, message="File or directory not found 📂", detail=None) -> None:
+        super().__init__(message)
+        self.add_note(f"""
+            No se encuentra el archivo o ruta. {detail}
+        """)
+        self.error_code = error_codes["SERVER_UNKNOWN_ERROR"]
+        self.status_code = status_codes["INTERNAL_SERVER_ERROR"]
+        self.http_argument = "Internal Server Error 💀"
