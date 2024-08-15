@@ -1,5 +1,5 @@
 from errors.exception_classes import InvalidImageType, FileNotFound
-from route_resolver import static_files
+from route_resolver import get_image_path
 from fastapi import UploadFile
 from io import BytesIO
 from uuid import uuid4
@@ -18,7 +18,7 @@ async def upload_image(image_data: UploadFile) -> str:
             image.save(webp_stream, format="WEBP")
             webp_stream.seek(0)
 
-            file_path = static_files(f"{new_name}.webp")
+            file_path = get_image_path(f"{new_name}.webp")
             with open(file_path, "wb") as webp_file:
                 webp_file.write(webp_stream.read())
                 
@@ -32,7 +32,7 @@ async def upload_image(image_data: UploadFile) -> str:
 
 
 def delete_image(image_path: str) -> None:
-    file_path = os.path.join("static", "images", image_path)
+    file_path = get_image_path(image_path)
     
     try:
         os.remove(file_path)
