@@ -28,4 +28,4 @@ def validate_data(
         ).model_dump()
 
     except ValidationError as e:
-        raise ErrorInFields(e)
+        raise ErrorInFields(e) from e

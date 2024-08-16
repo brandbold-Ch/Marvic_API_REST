@@ -1,4 +1,5 @@
-from decorators.error_decorators import validation_handler, handle_exceptions
+from decorators.validator_decorators import entity_validator
+from decorators.error_decorators import handle_exceptions
 from sqlalchemy.orm.session import Session
 from utils.image_tools import delete_image
 from models.user_model import UserModel
@@ -24,7 +25,7 @@ class UserServices:
 
         return user_create.to_dict()
 
-    @validation_handler(user=True)
+    @entity_validator(user=True)
     def update_user(self, **kwargs) -> dict:
         user_update: UserModel = kwargs.get("object_result")
         user_data = kwargs.get("user_data")
@@ -36,12 +37,12 @@ class UserServices:
 
         return user_update.to_dict()
 
-    @validation_handler(user=True)
+    @entity_validator(user=True)
     def get_user(self, **kwargs) -> dict:
         user_data: UserModel = kwargs.get("object_result")
         return user_data.to_dict()
 
-    @validation_handler(user=True)
+    @entity_validator(user=True)
     def delete_user(self, **kwargs) -> None:
         user_delete: UserModel = kwargs.get("object_result")
         self.session.delete(user_delete)

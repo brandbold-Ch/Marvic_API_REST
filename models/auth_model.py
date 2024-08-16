@@ -14,9 +14,9 @@ class AuthModel(Base):
     password = Column(String, nullable=False)
     role = Column(String(13), nullable=False)
 
-    def update_credentials_fields(self, email: str, password: str) -> None:
-        self.email = email
-        self.password = password
+    def update_credentials(self, **kwargs) -> None:
+        for field, value in kwargs.items():
+            setattr(self, field, value)
 
     def to_dict(self) -> dict:
         return {

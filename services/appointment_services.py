@@ -1,6 +1,5 @@
-from decorators.error_decorators import validation_handler
+from decorators.validator_decorators import entity_validator
 from models.appointment_model import AppointmentModel
-from models.pet_model import PetModel
 from sqlalchemy.orm import Session
 
 
@@ -9,7 +8,7 @@ class AppointmentServices:
     def __init__(self, session: Session):
         self.session = session
 
-    @validation_handler(pet=True)
+    @entity_validator(pet=True)
     def create_appointment(self, **kwargs) -> dict:
         appointment_create = AppointmentModel(
             **kwargs.get("appointment_data"),
@@ -21,12 +20,12 @@ class AppointmentServices:
 
         return appointment_create.to_dict()
 
-    @validation_handler(appointment=True)
+    @entity_validator(appointment=True)
     def get_appointment(self, **kwargs) -> dict:
         appointment_data: AppointmentModel = kwargs.get("object_result")
         return appointment_data.to_dict()
 
-    @validation_handler(pet=True)
+    @entity_validator(pet=True)
     def get_appointments(self, **kwargs) -> list[dict]:
         appointments: list[AppointmentModel] = kwargs.get(
             "object_result"
@@ -34,7 +33,7 @@ class AppointmentServices:
 
         return [appointment.to_dict() for appointment in appointments]
 
-    @validation_handler(appointment=True)
+    @entity_validator(appointment=True)
     def delete_appointment(self, **kwargs) -> None:
         self.session.delete(kwargs.get("object_result"))
         self.session.commit()

@@ -1,4 +1,4 @@
-from decorators.error_decorators import validation_handler
+from decorators.validator_decorators import entity_validator
 from utils.image_tools import upload_image, delete_image
 from sqlalchemy.orm.session import Session
 from models.image_model import ImageModel
@@ -11,7 +11,7 @@ class PetServices:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    @validation_handler(user=True)
+    @entity_validator(user=True)
     async def create_pet(self, **kwargs) -> dict:
         pet_data = kwargs.get("pet_data")
         image_data = pet_data.pop("image")
@@ -29,17 +29,17 @@ class PetServices:
 
         return pet_create.to_dict()
 
-    @validation_handler(user=True)
+    @entity_validator(user=True)
     def get_pets(self, **kwargs) -> list[dict]:
         pets: list[PetModel] = kwargs.get("object_result").pets
         return [pet.to_dict() for pet in pets]
 
-    @validation_handler(pet=True)
+    @entity_validator(pet=True)
     def get_pet(self, **kwargs) -> dict:
         pet_data: PetModel = kwargs.get("object_result")
         return pet_data.to_dict()
 
-    @validation_handler(pet=True)
+    @entity_validator(pet=True)
     async def update_pet(self, **kwargs) -> dict:
         pet_update: PetModel = kwargs.get("object_result")
         pet_data = kwargs.get("pet_data")
@@ -57,7 +57,7 @@ class PetServices:
 
         return pet_update.to_dict()
 
-    @validation_handler(pet=True)
+    @entity_validator(pet=True)
     def delete_pet(self, **kwargs) -> None:
         pet_delete: PetModel = kwargs.get("object_result")
         self.session.delete(pet_delete)

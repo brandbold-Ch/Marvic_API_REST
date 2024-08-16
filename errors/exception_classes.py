@@ -98,3 +98,14 @@ class FileNotFound(ServerBaseException):
         self.error_code = error_codes["SERVER_UNKNOWN_ERROR"]
         self.status_code = status_codes["INTERNAL_SERVER_ERROR"]
         self.http_argument = "Internal Server Error 💀"
+
+
+class PasswordDoesNotMatch(ServerBaseException):
+    def __init__(self, message="Passwords do not match 🔐") -> None:
+        super().__init__(message)
+        self.add_note(f"""
+               Las contraseñas no coinciden.
+           """)
+        self.error_code = error_codes["DB_INVALID_FORMAT_ID"]
+        self.status_code = status_codes["BAD_REQUEST"]
+        self.http_argument = "Bad Request ❓"
