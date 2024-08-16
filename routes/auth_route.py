@@ -1,6 +1,5 @@
 from controllers.auth_controller import AuthControllers
 from utils.config_orm import SessionLocal
-from fastapi.requests import Request
 from fastapi import APIRouter, Body, Path
 from typing import Annotated
 
@@ -11,7 +10,6 @@ admin_controller = AuthControllers(SessionLocal())
 
 @auth_routes.put("/change-password/{entity_id}")
 async def update_auth(
-        request: Request,
         old_password: Annotated[str, Body(...)],
         new_password: Annotated[str, Body(...)],
         email: Annotated[str, Body(...)],

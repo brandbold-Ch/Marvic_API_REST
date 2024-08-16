@@ -17,4 +17,3 @@ class ImageModel(Base):
             "pet_id": str(self.id),
             "medical_history_id": str(self.medical_history_id)
         }
-    

@@ -1,5 +1,5 @@
 from errors.handler_exceptions import handle_do_not_exists
-from decorators.error_decorators import exceptions_handler
+from decorators.error_decorators import validation_handler
 from sqlalchemy.orm.session import Session
 from models.admin_model import AdminModel
 from models.auth_model import AuthModel
@@ -11,8 +11,14 @@ class AuthServices:
     def __init__(self, session: Session):
         self.session = session
 
-    @exceptions_handler
-    def update_auth(self, old_password: str, new_password: str, email: str, entity_id: str, role: str) -> dict:
+    def update_auth(
+            self,
+            old_password: str,
+            new_password: str,
+            email: str,
+            entity_id: str,
+            role: str
+    ) -> dict:
         if role == "USER":
             user_auth: AuthModel | None = (
                 self.session.query(AuthModel)

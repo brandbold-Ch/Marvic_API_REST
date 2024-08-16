@@ -1,3 +1,4 @@
+from errors.exception_classes import ServerBaseException
 from routes.appointment_route import appointment_routes
 from starlette.responses import FileResponse
 from routes.user_router import user_routes
@@ -9,7 +10,6 @@ from utils.config_orm import Base, engine
 from fastapi import FastAPI, status
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
-from errors.exception_classes import ServerBaseException
 
 
 app = FastAPI(

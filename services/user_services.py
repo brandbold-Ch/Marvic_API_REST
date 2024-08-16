@@ -1,4 +1,4 @@
-from decorators.error_decorators import exceptions_handler
+from decorators.error_decorators import validation_handler, handle_exceptions
 from sqlalchemy.orm.session import Session
 from utils.image_tools import delete_image
 from models.user_model import UserModel
@@ -10,8 +10,11 @@ class UserServices:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    @exceptions_handler()
-    def create_user(self, user_data: dict, auth_data: dict) -> dict:
+    @handle_exceptions
+    def create_user(self, **kwargs) -> dict:
+        user_data = kwargs.get("user_data")
+        auth_data = kwargs.get("auth_data")
+
         user_create = UserModel(**user_data)
         auth_create = AuthModel(**auth_data, user_id=user_create.id)
 
@@ -21,34 +24,26 @@ class UserServices:
 
         return user_create.to_dict()
 
-    @exceptions_handler(verify_user=True)
-    def update_user(self, user_id: str, user_data: dict) -> dict:
+    @validation_handler(user=True)
+    def update_user(self, **kwargs) -> dict:
+        user_update: UserModel = kwargs.get("object_result")
+        user_data = kwargs.get("user_data")
         del user_data["id"]
 
-        user_update: UserModel | None = (
-            self.session.query(UserModel)
-            .where(user_id == UserModel.id)
-            .first()
-        )
         user_update.update_fields(**user_data)
         self.session.add(user_update)
         self.session.commit()
 
         return user_update.to_dict()
 
-    @exceptions_handler(verify_user=True)
-    def get_user(self, user_id: str) -> dict:
-        user_data: UserModel | None = self.session.get(UserModel, user_id)
-
+    @validation_handler(user=True)
+    def get_user(self, **kwargs) -> dict:
+        user_data: UserModel = kwargs.get("object_result")
         return user_data.to_dict()
 
-    @exceptions_handler(verify_user=True)
-    def delete_user(self, user_id: str) -> None:
-        user_delete: UserModel | None = (
-            self.session.query(UserModel)
-            .where(user_id == UserModel.id)
-            .first()
-        )
+    @validation_handler(user=True)
+    def delete_user(self, **kwargs) -> None:
+        user_delete: UserModel = kwargs.get("object_result")
         self.session.delete(user_delete)
         self.session.commit()
 

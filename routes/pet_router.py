@@ -1,10 +1,10 @@
-from endpoint_validators.pet_validator import validate_data
+from validators.pet_validator import validate_data
 from controllers.pet_controller import PetController
 from fastapi import APIRouter, Path, status
 from fastapi.responses import JSONResponse
 from utils.config_orm import SessionLocal
-from fastapi import Depends
 from typing import Annotated
+from fastapi import Depends
 
 
 pet_routes = APIRouter()
@@ -16,8 +16,9 @@ async def create_pet(
         user_id: Annotated[str, Path(max_length=36)],
         pet_data=Depends(validate_data)
 ) -> JSONResponse:
-    result: dict = await pet_controller.create_pet(user_id, pet_data)
-
+    result: dict = await pet_controller.create_pet(
+        user_id=user_id, pet_data=pet_data
+    )
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
         content={
@@ -35,7 +36,7 @@ async def create_pet(
 async def get_pets(user_id: Annotated[str, Path(max_length=36)]) -> JSONResponse:
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=pet_controller.get_pets(user_id)
+        content=pet_controller.get_pets(user_id=user_id)
     )
 
 
@@ -46,7 +47,9 @@ async def get_pet(
 ) -> JSONResponse:
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=pet_controller.get_pet(user_id, pet_id)
+        content=pet_controller.get_pet(
+            user_id=user_id, pet_id=pet_id
+        )
     )
 
 
@@ -56,8 +59,11 @@ async def update_pet(
         pet_id: Annotated[str, Path(max_length=36)],
         pet_data=Depends(validate_data)
 ) -> JSONResponse:
-    result = await pet_controller.update_pet(user_id, pet_id, pet_data)
-
+    result = await pet_controller.update_pet(
+        user_id=user_id,
+        pet_id=pet_id,
+        pet_data=pet_data
+    )
     return JSONResponse(
         status_code=status.HTTP_202_ACCEPTED,
         content={
@@ -76,5 +82,7 @@ async def delete_pet(
         user_id: Annotated[str, Path(max_length=36)],
         pet_id: Annotated[str, Path(max_length=36)]
 ) -> JSONResponse:
-    pet_controller.delete_pet(user_id, pet_id)
+    pet_controller.delete_pet(
+        user_id=user_id, pet_id=pet_id
+    )
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)

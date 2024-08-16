@@ -1,9 +1,8 @@
-from decorators.error_decorators import exceptions_handler
+from decorators.error_decorators import validation_handler
 from utils.image_tools import upload_image, delete_image
 from sqlalchemy.orm.session import Session
 from models.image_model import ImageModel
 from models.pet_model import PetModel
-from sqlalchemy import and_
 from uuid import uuid4
 
 
@@ -12,11 +11,14 @@ class PetServices:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    @exceptions_handler(verify_user=True)
-    async def create_pet(self, user_id: str, pet_data: dict) -> dict:
+    @validation_handler(user=True)
+    async def create_pet(self, **kwargs) -> dict:
+        pet_data = kwargs.get("pet_data")
         image_data = pet_data.pop("image")
 
-        pet_create = PetModel(**pet_data, user_id=user_id)
+        pet_create = PetModel(
+            **pet_data, user_id=kwargs.get("user_id")
+        )
         self.session.add(pet_create)
         self.session.commit()
 
@@ -27,33 +29,24 @@ class PetServices:
 
         return pet_create.to_dict()
 
-    @exceptions_handler(verify_user=True)
-    def get_pets(self, user_id: str) -> list[dict]:
-        pets = (self.session.query(PetModel).where(
-            user_id == PetModel.user_id
-        ).all())
-
+    @validation_handler(user=True)
+    def get_pets(self, **kwargs) -> list[dict]:
+        pets: list[PetModel] = kwargs.get("object_result").pets
         return [pet.to_dict() for pet in pets]
 
-    @exceptions_handler(verify_pet=True)
-    def get_pet(self, user_id: str, pet_id: str) -> dict:
-        pet_data: PetModel | None = self.session.query(PetModel).filter(
-            and_(*[PetModel.user_id == user_id, PetModel.id == pet_id])
-        ).first()
-
+    @validation_handler(pet=True)
+    def get_pet(self, **kwargs) -> dict:
+        pet_data: PetModel = kwargs.get("object_result")
         return pet_data.to_dict()
 
-    @exceptions_handler(verify_pet=True)
-    async def update_pet(self, user_id: str, pet_id: str, pet_data: dict) -> dict:
-        del pet_data["id"]
+    @validation_handler(pet=True)
+    async def update_pet(self, **kwargs) -> dict:
+        pet_update: PetModel = kwargs.get("object_result")
+        pet_data = kwargs.get("pet_data")
         image_data = pet_data.pop("image")
+        del pet_data["id"]
 
-        pet_update: PetModel | None = self.session.query(PetModel).where(and_(*[
-            PetModel.user_id == user_id,
-            PetModel.id == pet_id
-        ])).first()
         pet_update.update_fields(**pet_data)
-
         self.session.add(pet_update)
         self.session.commit()
 
@@ -64,12 +57,9 @@ class PetServices:
 
         return pet_update.to_dict()
 
-    @exceptions_handler(verify_pet=True)
-    def delete_pet(self, user_id: str, pet_id: str) -> None:
-        pet_delete: PetModel | None = self.session.query(PetModel).where(and_(*[
-            PetModel.user_id == user_id,
-            PetModel.id == pet_id
-        ])).first()
+    @validation_handler(pet=True)
+    def delete_pet(self, **kwargs) -> None:
+        pet_delete: PetModel = kwargs.get("object_result")
         self.session.delete(pet_delete)
         self.session.commit()
 

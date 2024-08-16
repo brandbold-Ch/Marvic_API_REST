@@ -7,17 +7,17 @@ class PetController:
     def __init__(self, session: Session) -> None:
         self.pet = PetServices(session)
 
-    async def create_pet(self, user_id: str, pet_data: dict) -> dict:
-        return await self.pet.create_pet(user_id, pet_data)
+    async def create_pet(self, **kwargs) -> dict:
+        return await self.pet.create_pet(**kwargs)
 
-    def get_pets(self, user_id: str) -> list[dict]:
-        return self.pet.get_pets(user_id)
+    def get_pets(self, **kwargs) -> list[dict]:
+        return self.pet.get_pets(**kwargs)
 
-    def get_pet(self, user_id: str, pet_id: str) -> dict:
-        return self.pet.get_pet(user_id, pet_id)
+    def get_pet(self, **kwargs) -> dict:
+        return self.pet.get_pet(**kwargs)
 
-    async def update_pet(self, user_id: str, pet_id: str, pet_data: dict) -> dict:
-        return await self.pet.update_pet(user_id, pet_id, pet_data)
+    async def update_pet(self, **kwargs) -> dict:
+        return await self.pet.update_pet(**kwargs)
 
-    def delete_pet(self, user_id: str, pet_id: str) -> None:
-        self.pet.delete_pet(user_id, pet_id)
+    def delete_pet(self, **kwargs) -> None:
+        self.pet.delete_pet(**kwargs)

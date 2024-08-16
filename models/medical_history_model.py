@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Text, UUID, ForeignKey
-from sqlalchemy.orm import relationship
 from utils.config_orm import Base
 
 
@@ -18,4 +17,3 @@ class MedicalHistoryModel(Base):
             "appointment_id": str(self.appointment_id),
             "staff_id": str(self.staff_id),
         }
-    

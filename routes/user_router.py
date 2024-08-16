@@ -1,4 +1,4 @@
-from endpoint_validators.user_validator import validate_create, validate_update
+from validators.user_validator import validate_create, validate_update
 from controllers.user_controller import UserControllers
 from fastapi import APIRouter, Path, status, Depends
 from fastapi.responses import JSONResponse
@@ -10,9 +10,12 @@ user_routes = APIRouter()
 user_controller = UserControllers(SessionLocal())
 
 
-@user_routes.post("/")
+@user_routes.post("/singup")
 async def create_user(user_data=Depends(validate_create)) -> JSONResponse:
-    result: dict = user_controller.create_user(*user_data)
+    result: dict = user_controller.create_user(
+        user_data=user_data[0],
+        auth_data=user_data[1]
+    )
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
@@ -32,7 +35,10 @@ async def update_user(
         user_id: Annotated[str, Path(max_length=36)],
         user_data=Depends(validate_update)
 ) -> JSONResponse:
-    result: dict = user_controller.update_user(user_id, user_data)
+    result: dict = user_controller.update_user(
+        user_data=user_data,
+        user_id=user_id
+    )
 
     return JSONResponse(
         status_code=status.HTTP_202_ACCEPTED,
@@ -51,11 +57,11 @@ async def update_user(
 async def get_user(user_id: Annotated[str, Path(max_length=36)]) -> JSONResponse:
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=user_controller.get_user(user_id)
+        content=user_controller.get_user(user_id=user_id)
     )
 
 
 @user_routes.delete("/{user_id}")
 async def delete_user(user_id: Annotated[str, Path(max_length=36)]) -> JSONResponse:
-    user_controller.delete_user(user_id)
+    user_controller.delete_user(user_id=user_id)
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)

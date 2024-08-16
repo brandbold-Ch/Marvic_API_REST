@@ -32,9 +32,8 @@ async def upload_image(image_data: UploadFile) -> str:
 
 
 def delete_image(image_path: str) -> None:
-    file_path = get_image_path(image_path)
-    
     try:
+        file_path = get_image_path(image_path)
         os.remove(file_path)
 
     except FileNotFoundError as e:
