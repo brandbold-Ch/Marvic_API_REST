@@ -16,7 +16,7 @@ def handle_exceptions(func: Callable) -> Callable:
             raise DuplicatedInDatabase() from e
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise UnknownError() from e
+            raise UnknownError(detail=e) from e
         finally:
             self.session.close()
     return wrapper

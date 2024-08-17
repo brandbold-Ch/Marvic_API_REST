@@ -12,3 +12,6 @@ class AuthControllers:
 
     def get_auth(self, **kwargs) -> dict:
         return self.auth.get_auth(**kwargs)
+
+    def auth_login(self, **kwargs) -> dict:
+        return self.auth.auth_login(**kwargs)

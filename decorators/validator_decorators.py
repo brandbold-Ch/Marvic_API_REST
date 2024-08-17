@@ -29,6 +29,7 @@ def verify_auth_by_email(_obj, email: str) -> AuthModel:
     auth = _obj.session.query(AuthModel).where(
         AuthModel.email == email
     ).first()
+    print(auth)
     if auth is None:
         raise DoesNotExistInDatabase("The auth does not exist 🔐")
     return auth
@@ -55,25 +56,45 @@ def verify_auth_by_id(_obj, entity_id: str, role: str) -> AuthModel:
         case _:
             raise ErrorInFields("The role must be USER or ADMINISTRATOR ❓")
 
-
     return auth
 
 
-def verify_passwords(func: Callable) -> Callable:
+def verify_passwords_for_login(func: Callable) -> Callable:
+    @handle_exceptions
+    def wrapper(self, **kwargs):
+        auth_data: AuthModel = verify_auth_by_email(
+            self, kwargs.get("email"),
+        )
+        print(auth_data)
+        ctx_password: bytes = kwargs.get("ctx_password").encode("utf-8")
+        password: bytes = auth_data.password.encode("utf-8")
+
+        if bcrypt.checkpw(ctx_password, password):
+            return func(
+                self, **kwargs,
+                object_result=auth_data,
+                auth_data=auth_data
+            )
+        else:
+            raise PasswordDoesNotMatch()
+    return wrapper
+
+
+def verify_passwords_for_change(func: Callable) -> Callable:
     @handle_exceptions
     def wrapper(self, **kwargs):
         auth_data: AuthModel = verify_auth_by_id(
             self, kwargs.get("entity_id"),
             kwargs.get("role")
         )
-        old_password: bytes = kwargs.get("old_password").encode("utf-8")
+        ctx_password: bytes = kwargs.get("ctx_password").encode("utf-8")
         password: bytes = auth_data.password.encode("utf-8")
         new_password: str = bcrypt.hashpw(
             kwargs.get("new_password").encode("utf-8"),
             bcrypt.gensalt(12)
         ).decode("utf-8")
 
-        if bcrypt.checkpw(old_password, password):
+        if bcrypt.checkpw(ctx_password, password):
             auth_data.email = check_email(kwargs.get("email"))
             auth_data.password = new_password
 
