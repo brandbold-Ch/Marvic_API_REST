@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
-from uuid import uuid4, UUID
 from dotenv import load_dotenv
+from uuid import uuid4, UUID
 import os
 
 load_dotenv()

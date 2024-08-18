@@ -1,11 +1,24 @@
-from errors.exception_classes import ExpiredToken, InvalidToken
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from errors.exception_classes import ExpiredToken, InvalidToken, NotFoundToken
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from jose import JWTError, jwt
+from fastapi import Request
 import os
 
-
 load_dotenv()
+
+
+class CustomHTTPBearer(HTTPBearer):
+    async def __call__(self, request: Request) -> HTTPAuthorizationCredentials:
+        self.auto_error = False
+        credentials: HTTPAuthorizationCredentials = await super().__call__(request)
+
+        if credentials is None:
+            raise NotFoundToken()
+
+        request.state.token = credentials.credentials
+        return credentials
 
 
 def create_token(payload_data: dict) -> str:

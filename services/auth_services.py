@@ -1,4 +1,4 @@
-from utils.token_validator import create_token
+from utils.token_tools import create_token
 from sqlalchemy.orm.session import Session
 from models.auth_model import AuthModel
 from schemas.auth_schema import Auth
@@ -34,9 +34,9 @@ class AuthServices:
         auth_data: AuthModel = kwargs.get("object_result")
         return {
             "token": create_token({
-                "user_id": auth_data.user_id,
+                "user_id": str(auth_data.user_id),
                 "role": auth_data.role
             }),
-            "user_id": auth_data.user_id,
+            "user_id": str(auth_data.user_id),
             "role": auth_data.role
         }

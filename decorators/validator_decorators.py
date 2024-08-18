@@ -1,13 +1,21 @@
-from errors.exception_classes import DoesNotExistInDatabase, PasswordDoesNotMatch, ErrorInFields
 from models.appointment_model import AppointmentModel
 from .error_decorators import handle_exceptions
+from utils.token_tools import verify_token
 from models.admin_model import AdminModel
 from models.user_model import UserModel
 from models.auth_model import AuthModel
+from fastapi.requests import Request
 from models.pet_model import PetModel
 from typing import Callable
+from functools import wraps
 import bcrypt
 import re
+from errors.exception_classes import (
+    DoesNotExistInDatabase,
+    PasswordDoesNotMatch,
+    ErrorInFields,
+    IncorrectUser
+)
 
 
 def check_email(email: str) -> str:
@@ -29,26 +37,25 @@ def verify_auth_by_email(_obj, email: str) -> AuthModel:
     auth = _obj.session.query(AuthModel).where(
         AuthModel.email == email
     ).first()
-    print(auth)
     if auth is None:
         raise DoesNotExistInDatabase("The auth does not exist 🔐")
     return auth
 
 
-def verify_auth_by_id(_obj, entity_id: str, role: str) -> AuthModel:
+def verify_auth_by_id(_obj, user_id: str, role: str) -> AuthModel:
     auth: AuthModel | None = None
 
     match role:
         case "USER":
             auth = _obj.session.query(AuthModel).where(
-                AuthModel.user_id == entity_id
+                AuthModel.user_id == user_id
             ).first()
             if auth is None:
                 raise DoesNotExistInDatabase("The auth does not exist 🔐")
 
         case "ADMINISTRATOR":
             auth = _obj.session.query(AuthModel).where(
-                AuthModel.admin_id == entity_id
+                AuthModel.admin_id == user_id
             ).first()
             if auth is None:
                 raise DoesNotExistInDatabase("The auth does not exist 🔐")
@@ -63,17 +70,15 @@ def verify_passwords_for_login(func: Callable) -> Callable:
     @handle_exceptions
     def wrapper(self, **kwargs):
         auth_data: AuthModel = verify_auth_by_email(
-            self, kwargs.get("email"),
+            self, check_email(kwargs.get("email")),
         )
-        print(auth_data)
-        ctx_password: bytes = kwargs.get("ctx_password").encode("utf-8")
-        password: bytes = auth_data.password.encode("utf-8")
+        password: bytes = kwargs.get("password").encode("utf-8")
+        password_db: bytes = auth_data.password.encode("utf-8")
 
-        if bcrypt.checkpw(ctx_password, password):
+        if bcrypt.checkpw(password, password_db):
             return func(
                 self, **kwargs,
-                object_result=auth_data,
-                auth_data=auth_data
+                object_result=auth_data
             )
         else:
             raise PasswordDoesNotMatch()
@@ -84,7 +89,7 @@ def verify_passwords_for_change(func: Callable) -> Callable:
     @handle_exceptions
     def wrapper(self, **kwargs):
         auth_data: AuthModel = verify_auth_by_id(
-            self, kwargs.get("entity_id"),
+            self, kwargs.get("user_id"),
             kwargs.get("role")
         )
         ctx_password: bytes = kwargs.get("ctx_password").encode("utf-8")
@@ -100,8 +105,7 @@ def verify_passwords_for_change(func: Callable) -> Callable:
 
             return func(
                 self, **kwargs,
-                object_result=auth_data,
-                auth_data=auth_data
+                object_result=auth_data
             )
         else:
             raise PasswordDoesNotMatch()
@@ -186,3 +190,16 @@ def entity_validator(
             return func(self, **kwargs)
         return wrapper
     return decorator
+
+
+def authenticate(func: Callable) -> Callable:
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        request: Request = kwargs.get('request')
+        user_req: dict = verify_token(request.headers.get("authorization")[7:])
+
+        if user_req["user_id"] == kwargs.get("user_id"):
+            return await func(*args, **kwargs)
+        else:
+            raise IncorrectUser()
+    return wrapper

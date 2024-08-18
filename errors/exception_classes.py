@@ -115,19 +115,41 @@ class ExpiredToken(ServerBaseException):
     def __init__(self, message="Token has expired 💨") -> None:
         super().__init__(message)
         self.add_note("""
-               El token ha exirado.
+               El token ha expirado.
            """)
         self.error_code = None
         self.status_code = status_codes["UNAUTHORIZED"]
-        self.http_argument = "Unauthorized ❓🔒"
+        self.http_argument = "Unauthorized ⚠️"
+
+
+class NotFoundToken(ServerBaseException):
+    def __init__(self, message="Token not found 🤷‍♂️") -> None:
+        super().__init__(message)
+        self.add_note("""
+               No se encuentra el token en el header.
+           """)
+        self.error_code = None
+        self.status_code = status_codes["FORBIDDEN"]
+        self.http_argument = "Forbidden ⚔️"
 
 
 class InvalidToken(ServerBaseException):
     def __init__(self, message="The token is invalid 🔏") -> None:
         super().__init__(message)
         self.add_note("""
-               El token ha exirado.
+               El token es inválido.
            """)
         self.error_code = None
         self.status_code = status_codes["BAD_REQUEST"]
         self.http_argument = "Bad Request ❓🔏"
+
+
+class IncorrectUser(ServerBaseException):
+    def __init__(self, message="The token does not correspond to the user 🤡") -> None:
+        super().__init__(message)
+        self.add_note("""
+               El token que mandas no corresponde con el usuario.
+           """)
+        self.error_code = None
+        self.status_code = status_codes["UNAUTHORIZED"]
+        self.http_argument = "Unauthorized ⚠️"
