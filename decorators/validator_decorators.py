@@ -195,7 +195,7 @@ def entity_validator(
 def authenticate(func: Callable) -> Callable:
     @wraps(func)
     async def wrapper(*args, **kwargs):
-        request: Request = kwargs.get('request')
+        request: Request = kwargs.get("request")
         user_req: dict = verify_token(request.headers.get("authorization")[7:])
 
         if user_req["user_id"] == kwargs.get("user_id"):
