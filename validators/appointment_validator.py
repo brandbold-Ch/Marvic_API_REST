@@ -7,13 +7,13 @@ from fastapi import Body
 
 
 def validate_create(
-        expiration_date: Annotated[datetime, Body(...)],
+        timestamp: Annotated[datetime, Body(...)],
         issue: Annotated[str, Body(...)] = None,
         price: Annotated[float, Body(...)] = None
 ) -> dict:
     try:
         return Appointment(
-            expiration_date=expiration_date,
+            timestamp=timestamp,
             issue=issue,
             price=price
         ).model_dump()

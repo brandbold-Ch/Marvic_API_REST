@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificación de Nueva Cita</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 10px 0;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background-color: #f4f4f4;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        strong {
+            color: #34495e;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>¡Nueva Cita Creada!</h1>
+        <p>Hola Administrador,</p>
+        <p>Se ha creado una nueva cita. Aquí están los detalles:</p>
+        <ul>
+            <li><strong>Id de cita:</strong> {id}</li>
+            <li><strong>Asunto:</strong> {issue}</li>
+            <li><strong>Fecha de creación:</strong> {created_at}</li>
+            <li><strong>Fecha de la Cita:</strong> {timestamp}</li>
+        </ul>
+        <p>Por favor, revisa los detalles y asegúrate de que todo esté en orden.</p>
+        <p>Saludos,<br>El sistema de gestión de citas</p>
+        <div class="footer">
+            <p>&copy; 2024 Sistema de Gestión de Citas Marvic. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,29 +1,38 @@
-import os
+from tasks.celery_mail_delivery import email_app_task
 from email.message import EmailMessage
 from dotenv import load_dotenv
 import smtplib
+import os
 
 load_dotenv()
 
 
-def recover_password(email_subject: str, receiver_email: str):
+@email_app_task.task
+def mail_sender(
+        template: str,
+        email_subject: str,
+        receiver_email: str
+) -> None:
     message = EmailMessage()
 
     sender_email_address = os.getenv("SENDER_EMAIL_ADDRESS")
-    email_smtp = "smtp.gmail.com"
     email_password = os.getenv("EMAIL_PASSWORD")
+    email_smtp = "smtp.gmail.com"
+
+    if not sender_email_address or not email_password:
+        raise ValueError("Sender email address or email password is not set in environment variables")
 
     message["Subject"] = email_subject
     message["From"] = sender_email_address
     message["To"] = receiver_email
 
-    message.set_content("Hola amigo dev de Marvic")
-    server = smtplib.SMTP(email_smtp, 587)
+    message.add_alternative(template, subtype='html')
 
-    server.ehlo()
-    server.starttls()
-
-    server.login(sender_email_address, email_password)
-    server.send_message(message)
-
-    server.quit()
+    try:
+        with smtplib.SMTP(email_smtp, 587) as server:
+            server.ehlo()
+            server.starttls()
+            server.login(sender_email_address, email_password)
+            server.send_message(message)
+    except Exception as e:
+        print(f"Failed to send email: {e}")

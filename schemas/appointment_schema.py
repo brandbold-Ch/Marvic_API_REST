@@ -8,8 +8,8 @@ status_choices = ["pending", "completed", "canceled"]
 
 class Appointment(BaseModel):
     id: UUID = Field(default_factory=lambda: uuid4())
-    creation_date: datetime = Field(default=datetime.now())
-    expiration_date: datetime
+    created_at: datetime = Field(default=datetime.now())
+    timestamp: datetime
     issue: str = None
     status: str = Field(default="pending")
     price: float = Field(default=200.0)

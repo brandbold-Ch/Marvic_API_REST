@@ -6,8 +6,8 @@ class AppointmentModel(Base):
 
     __tablename__ = "appointment"
     id = Column(UUID, primary_key=True)
-    creation_date = Column(Date, nullable=False)
-    expiration_date = Column(Date, nullable=False)
+    created_at = Column(Date, nullable=False)
+    timestamp = Column(Date, nullable=False)
     pet_id = Column(UUID, ForeignKey("pet.id"), nullable=False)
     user_id = Column(UUID, ForeignKey("user.id"), nullable=False)
     issue = Column(Text, nullable=True)
@@ -18,8 +18,8 @@ class AppointmentModel(Base):
         return {
             "id": str(self.id),
             "dates": {
-                "creation_date": str(self.creation_date),
-                "expiration_date": str(self.expiration_date),
+                "creation_date": str(self.created_at),
+                "expiration_date": str(self.timestamp),
             },
             "relationships": {
                 "pet_id": str(self.pet_id),

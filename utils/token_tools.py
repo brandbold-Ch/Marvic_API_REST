@@ -22,7 +22,7 @@ class CustomHTTPBearer(HTTPBearer):
 
 
 def create_token(payload_data: dict) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=2)
+    expire = datetime.utcnow() + timedelta(days=7)
     payload_data.update({"exp": expire})
 
     return jwt.encode(

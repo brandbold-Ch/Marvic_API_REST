@@ -1,5 +1,7 @@
 from decorators.validator_decorators import entity_validator
 from models.appointment_model import AppointmentModel
+from utils.load_statics import load_admin_appt_tmpl
+from utils.email_server import mail_sender
 from sqlalchemy.orm import Session
 
 
@@ -17,6 +19,17 @@ class AppointmentServices:
         )
         self.session.add(appointment_create)
         self.session.commit()
+
+        mail_sender(
+            load_admin_appt_tmpl(
+                appt_id=str(appointment_create.id),
+                issue=appointment_create.issue,
+                created_at=str(appointment_create.created_at),
+                timestamp=str(appointment_create.timestamp)
+            ),
+            "Nueva cita agendada",
+            "jaredbrandon970@gmail.com"
+        )
 
         return appointment_create.to_dict()
 
