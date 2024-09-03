@@ -1,4 +1,4 @@
-from errors.exception_classes import InvalidId, DuplicatedInDatabase, UnknownError
+from errors.exception_classes import DbInvalidFormatIdError, DbDuplicatedKeyError, ServerUnknownError
 from sqlalchemy.exc import IntegrityError, DataError, SQLAlchemyError
 from typing import Callable
 
@@ -9,14 +9,14 @@ def handle_exceptions(func: Callable) -> Callable:
             return func(self, *args, **kwargs)
         except DataError as e:
             self.session.rollback()
-            raise InvalidId() from e
+            raise DbInvalidFormatIdError() from e
         except IntegrityError as e:
             print(e)
             self.session.rollback()
-            raise DuplicatedInDatabase() from e
+            raise DbDuplicatedKeyError() from e
         except SQLAlchemyError as e:
             self.session.rollback()
-            raise UnknownError(detail=e) from e
+            raise ServerUnknownError(detail=e) from e
         finally:
             self.session.close()
     return wrapper

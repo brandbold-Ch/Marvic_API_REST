@@ -1,4 +1,4 @@
-from errors.exception_classes import ErrorInFields
+from errors.exception_classes import DataValidationError
 from pydantic import ValidationError
 from schemas.pet_schema import Pet
 from typing import Annotated
@@ -28,4 +28,4 @@ def validate_data(
         ).model_dump()
 
     except ValidationError as e:
-        raise ErrorInFields(e) from e
+        raise DataValidationError(e) from e

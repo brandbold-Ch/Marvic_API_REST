@@ -1,20 +1,20 @@
 from errors.exception_classes import (
-    DoesNotExistInDatabase,
-    DuplicatedInDatabase,
-    InvalidId
+    DbNotFoundError,
+    DbDuplicatedKeyError,
+    DbInvalidFormatIdError
 )
 
 
 def handle_integrity_error() -> None:
-    raise DuplicatedInDatabase("That account already exists")
+    raise DbDuplicatedKeyError("That account already exists")
 
 
 def handle_data_error() -> None:
-    raise InvalidId("UUID with invalid format 🆔")
+    raise DbInvalidFormatIdError("UUID with invalid format 🆔")
 
 
 def handle_do_not_exists(model_name: str) -> None:
-    raise DoesNotExistInDatabase(f"The {model_name} does not exist ❌")
+    raise DbNotFoundError(f"The {model_name} does not exist ❌")
 
 
 def handle_sqlalchemy_error() -> None:

@@ -1,4 +1,4 @@
-from errors.exception_classes import ErrorInFields
+from errors.exception_classes import DataValidationError
 from schemas.user_schema import User
 from schemas.auth_schema import Auth
 from pydantic import ValidationError
@@ -27,7 +27,7 @@ def validate_create(
             ).model_dump()
         )
     except ValidationError as e:
-        raise ErrorInFields(e)
+        raise DataValidationError(e)
 
 
 def validate_update(
@@ -43,4 +43,4 @@ def validate_update(
         ).model_dump()
 
     except ValidationError as e:
-        raise ErrorInFields(e)
+        raise DataValidationError(e)

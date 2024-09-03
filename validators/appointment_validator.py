@@ -1,4 +1,4 @@
-from errors.exception_classes import ErrorInFields
+from errors.exception_classes import DataValidationError
 from schemas.appointment_schema import Appointment
 from pydantic import ValidationError
 from datetime import datetime
@@ -19,4 +19,4 @@ def validate_create(
         ).model_dump()
 
     except ValidationError as e:
-        raise ErrorInFields(e)
+        raise DataValidationError(e)

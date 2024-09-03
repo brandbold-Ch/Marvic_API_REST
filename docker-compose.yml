@@ -6,6 +6,7 @@ services:
     build: .
     depends_on:
       - db
+      - redis
     container_name: marvic-api
     ports:
       - "5000:5000"
@@ -32,6 +33,11 @@ services:
       - POSTGRES_DB=postgres
     expose:
       - 5432
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
 
   adminer:
     image: adminer

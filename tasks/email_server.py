@@ -1,13 +1,14 @@
-from tasks.celery_mail_delivery import email_app_task
+from errors.exception_classes import EmailSenderError
 from email.message import EmailMessage
 from dotenv import load_dotenv
+from celery_work import app
 import smtplib
 import os
 
 load_dotenv()
 
 
-@email_app_task.task
+@app.task
 def mail_sender(
         template: str,
         email_subject: str,
@@ -26,13 +27,13 @@ def mail_sender(
     message["From"] = sender_email_address
     message["To"] = receiver_email
 
-    message.add_alternative(template, subtype='html')
-
+    message.add_alternative(template, subtype="html")
     try:
         with smtplib.SMTP(email_smtp, 587) as server:
             server.ehlo()
             server.starttls()
             server.login(sender_email_address, email_password)
             server.send_message(message)
+
     except Exception as e:
-        print(f"Failed to send email: {e}")
+        raise EmailSenderError(detail=e) from e

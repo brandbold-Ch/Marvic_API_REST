@@ -1,8 +1,14 @@
 from decorators.validator_decorators import entity_validator
 from models.appointment_model import AppointmentModel
 from utils.load_statics import load_admin_appt_tmpl
-from utils.email_server import mail_sender
+from tasks.email_server import mail_sender
+from models.stack_model import StackModel
 from sqlalchemy.orm import Session
+from dotenv import load_dotenv
+from uuid import uuid4
+import os
+
+load_dotenv()
 
 
 class AppointmentServices:
@@ -11,16 +17,24 @@ class AppointmentServices:
         self.session = session
 
     @entity_validator(pet=True)
+    #@pending_appt_hecker
     def create_appointment(self, **kwargs) -> dict:
         appointment_create = AppointmentModel(
             **kwargs.get("appointment_data"),
             pet_id=kwargs.get("pet_id"),
             user_id=kwargs.get("user_id")
         )
+
         self.session.add(appointment_create)
+        self.session.add(
+            StackModel(
+                id=uuid4(),
+                appointment_id=appointment_create.id
+            )
+        )
         self.session.commit()
 
-        mail_sender(
+        mail_sender.delay(
             load_admin_appt_tmpl(
                 appt_id=str(appointment_create.id),
                 issue=appointment_create.issue,
@@ -28,7 +42,7 @@ class AppointmentServices:
                 timestamp=str(appointment_create.timestamp)
             ),
             "Nueva cita agendada",
-            "jaredbrandon970@gmail.com"
+            os.getenv("ADMIN_RECIPIENT_EMAIL")
         )
 
         return appointment_create.to_dict()

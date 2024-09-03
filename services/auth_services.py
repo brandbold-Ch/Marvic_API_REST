@@ -1,7 +1,6 @@
 from utils.token_tools import create_token
 from sqlalchemy.orm.session import Session
 from models.auth_model import AuthModel
-from schemas.auth_schema import Auth
 from decorators.validator_decorators import (
     verify_passwords_for_change,
     verify_passwords_for_login,

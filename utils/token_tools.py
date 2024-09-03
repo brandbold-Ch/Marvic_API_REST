@@ -1,5 +1,5 @@
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from errors.exception_classes import ExpiredToken, InvalidToken, NotFoundToken
+from errors.exception_classes import ExpiredTokenError, InvalidTokenError, NotFoundTokenError
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from jose import JWTError, jwt
@@ -15,7 +15,7 @@ class CustomHTTPBearer(HTTPBearer):
         credentials: HTTPAuthorizationCredentials = await super().__call__(request)
 
         if credentials is None:
-            raise NotFoundToken()
+            raise NotFoundTokenError()
 
         request.state.token = credentials.credentials
         return credentials
@@ -41,6 +41,6 @@ def verify_token(token: str) -> dict:
         return decoded_token
     except JWTError as e:
         if str(e) == "Signature has expired.":
-            raise ExpiredToken("Token has expired 💨") from e
+            raise ExpiredTokenError("Token has expired 💨") from e
         else:
-            raise InvalidToken() from e
+            raise InvalidTokenError() from e

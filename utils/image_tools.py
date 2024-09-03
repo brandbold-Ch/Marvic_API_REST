@@ -1,4 +1,4 @@
-from errors.exception_classes import InvalidImageType, FileNotFound
+from errors.exception_classes import InvalidImageTypeError, FilesNotFound, ServerUnknownError
 from route_resolver import get_image_path
 from fastapi import UploadFile
 from io import BytesIO
@@ -25,10 +25,13 @@ async def upload_image(image_data: UploadFile) -> str:
         return f"{new_name}.webp"
 
     except FileNotFoundError as e:
-        raise FileNotFound(detail=e) from e
+        raise FilesNotFound(detail=e) from e
 
     except IOError as e:
-        raise InvalidImageType(detail=e) from e
+        raise InvalidImageTypeError(detail=e) from e
+
+    except Exception as e:
+        raise ServerUnknownError(detail=e) from e
 
 
 def delete_image(image_path: str) -> None:
@@ -37,4 +40,7 @@ def delete_image(image_path: str) -> None:
         os.remove(file_path)
 
     except FileNotFoundError as e:
-        raise FileNotFound(detail=e) from e
+        raise FilesNotFound(detail=e) from e
+
+    except Exception as e:
+        raise ServerUnknownError(detail=e) from e
