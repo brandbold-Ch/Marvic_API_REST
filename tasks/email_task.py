@@ -1,11 +1,15 @@
 from errors.exception_classes import EmailSenderError
 from email.message import EmailMessage
 from dotenv import load_dotenv
-from celery_work import app
+from celery import Celery
 import smtplib
 import os
 
-load_dotenv()
+app = Celery(
+    "tasks",
+    broker="redis://redis:6379/0",
+    backend="redis://redis:6379/0"
+)
 
 
 @app.task
@@ -15,6 +19,8 @@ def mail_sender(
         receiver_email: str
 ) -> None:
     message = EmailMessage()
+
+    load_dotenv()
 
     sender_email_address = os.getenv("SENDER_EMAIL_ADDRESS")
     email_password = os.getenv("EMAIL_PASSWORD")
