@@ -15,7 +15,6 @@ services:
     env_file:
       - .env
     environment:
-      - URL=postgresql+psycopg2://postgres:Pd6JYU3<keNy=\0~eTQ38r-D?~"1>jfp2~-00;8Z3tS"i7%u.C@db:5432/postgres
       - HOST=db
       - PORT=5432
   db:
