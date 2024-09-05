@@ -14,7 +14,9 @@ services:
       - ./:/Marvic_API_REST
     env_file:
       - .env
-
+    environment:
+      - HOST=db
+      - PORT=10000
   db:
     image: postgres
     restart: always
