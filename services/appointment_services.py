@@ -36,10 +36,11 @@ class AppointmentServices:
 
         mail_sender.delay(
             load_admin_appt_tmpl(
-                appt_id=str(appointment_create.id),
+                appt_id=appointment_create.id,
                 issue=appointment_create.issue,
-                created_at=str(appointment_create.created_at),
-                timestamp=str(appointment_create.timestamp)
+                created_at=appointment_create.created_at,
+                timestamp=appointment_create.timestamp,
+                price=appointment_create.price
             ),
             "Nueva cita agendada",
             os.getenv("ADMIN_RECIPIENT_EMAIL")

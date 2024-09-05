@@ -1,26 +1,30 @@
-from celery.schedules import crontab
-from celery import Celery
+from services.stack_services import StackServices
+from utils.config_orm import SessionLocal
 from tasks.email_task import mail_sender
-
-
-app = Celery(
-    "queries",
-    broker="redis://redis:6379/0",
-    backend="redis://redis:6379/0",
-    include=['tasks']
-)
+from utils.load_statics import load_appt_reminder
+from utils.celery_config import app
+from datetime import datetime
 
 
 @app.task
 def check_table_stack():
-    mail_sender.delay("<h1>Hola<h1>", "Test", "jaredbrandon970@gmail.com")
+    stack = StackServices(SessionLocal())
 
+    for record in stack.get_stacks():
+        appt: tuple = stack.get_appointment(record.appointment_id)
+        end_date = appt[0].timestamp.date() - datetime.now().date()
 
-app.conf.beat_schedule = {
-    "check-task-table": {
-        "task": "queries.check_table_stack",
-        "schedule": crontab(minute="*")
-    },
-}
-
-app.conf.timezone = "UTC"
+        if end_date.days == 1:
+            mail_sender(
+                load_appt_reminder(
+                    issue=appt[0].issue,
+                    price=appt[0].price,
+                    timestamp=appt[0].timestamp,
+                    created_at=appt[0].created_at,
+                    pet=appt[2].name,
+                    user=appt[1].email
+                ),
+                "Recordatorio de Cita",
+                appt[1].email
+            )
+            stack.delete_stack(record)

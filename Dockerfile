@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "celery -A tasks.email_task worker --loglevel=info & celery -A tasks.query_task beat --loglevel=info & uvicorn main:app --reload --host 0.0.0.0 --port 5000"]
+CMD ["sh", "-c", "uvicorn main:app --reload --host 0.0.0.0 --port 5000 & celery -A utils.celery_config worker --beat --loglevel=info"]

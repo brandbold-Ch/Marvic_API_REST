@@ -1,15 +1,9 @@
 from errors.exception_classes import EmailSenderError
 from email.message import EmailMessage
+from utils.celery_config import app
 from dotenv import load_dotenv
-from celery import Celery
 import smtplib
 import os
-
-app = Celery(
-    "tasks",
-    broker="redis://redis:6379/0",
-    backend="redis://redis:6379/0"
-)
 
 
 @app.task
