@@ -16,7 +16,8 @@ services:
       - .env
     environment:
       - HOST=db
-      - PORT=5432
+      - DB_PORT=5432
+
   db:
     image: postgres
     restart: always
@@ -24,8 +25,8 @@ services:
     environment:
       - POSTGRES_PASSWORD=Pd6JYU3<keNy=\0~eTQ38r-D?~"1>jfp2~-00;8Z3tS"i7%u.C
       - POSTGRES_DB=postgres
-    ports:
-      - "5432:5432"
+    expose:
+      - 5432
 
   redis:
     image: redis:latest
