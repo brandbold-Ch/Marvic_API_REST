@@ -10,6 +10,6 @@ RUN python -m venv .venv
 RUN /bin/bash -c "source .venv/bin/activate"
 RUN pip install -r requirements.txt
 
-EXPOSE 8080
+EXPOSE 5000
 
-CMD ["sh", "-c", "uvicorn main:app --reload --host 0.0.0.0 --port 8080 & celery -A utils.celery_config worker --beat --loglevel=info"]
+CMD ["sh", "-c", "uvicorn main:app --reload --host 0.0.0.0 --port 5000 & celery -A utils.celery_config worker --beat --loglevel=info"]
