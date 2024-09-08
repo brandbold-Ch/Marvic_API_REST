@@ -5,16 +5,16 @@ from dotenv import load_dotenv
 import smtplib
 import os
 
+load_dotenv()
+
 
 @app.task
 def mail_sender(
-        template: str,
+        html_template: str,
         email_subject: str,
         receiver_email: str
 ) -> None:
     message = EmailMessage()
-
-    load_dotenv()
 
     sender_email_address = os.getenv("SENDER_EMAIL_ADDRESS")
     email_password = os.getenv("EMAIL_PASSWORD")
@@ -27,7 +27,7 @@ def mail_sender(
     message["From"] = sender_email_address
     message["To"] = receiver_email
 
-    message.add_alternative(template, subtype="html")
+    message.add_alternative(html_template, subtype="html")
     try:
         with smtplib.SMTP(email_smtp, 587) as server:
             server.ehlo()

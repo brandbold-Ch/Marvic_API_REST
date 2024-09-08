@@ -6,7 +6,7 @@ import os
 load_dotenv()
 
 
-class Admin(BaseModel):
+class AdminSchema(BaseModel):
     id: UUID = Field(default_factory=lambda: uuid4())
     name: str = Field(max_length=50)
     lastname: str = Field(max_length=50)

@@ -11,20 +11,29 @@ def check_table_stack():
     stack = StackServices(SessionLocal())
 
     for record in stack.get_stacks():
-        appt: tuple = stack.get_appointment(record.appointment_id)
-        end_date = appt[0].timestamp.date() - datetime.now().date()
+        try:
+            appt: tuple = stack.get_appointment(record.appointment_id)
+            appt_date, today = appt[0].timestamp.date(), datetime.now().date()
+            formatted_time = appt[0].timestamp.strftime("%I:%M %p")
+            diff = appt_date - today
 
-        if end_date.days == 1:
-            mail_sender(
-                load_appt_reminder(
-                    issue=appt[0].issue,
-                    price=appt[0].price,
-                    timestamp=appt[0].timestamp,
-                    created_at=appt[0].created_at,
-                    pet=appt[2].name,
-                    user=appt[1].email
-                ),
-                "Recordatorio de Cita",
-                appt[1].email
-            )
+            if diff.days == 1:
+                mail_sender(
+                    load_appt_reminder(
+                        issue=appt[0].issue,
+                        price=appt[0].price,
+                        timestamp=appt_date,
+                        created_at=appt[0].created_at.date(),
+                        pet=appt[2].name,
+                        user=appt[1].email,
+                        time=formatted_time
+                    ),
+                    "Recordatorio de Cita",
+                    appt[1].email
+                )
+
+        except AttributeError as e:
             stack.delete_stack(record)
+
+        except Exception as e:
+            print(e)

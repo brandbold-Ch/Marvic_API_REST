@@ -3,7 +3,7 @@ from uuid import uuid4, UUID
 import bcrypt
 
 
-class Auth(BaseModel):
+class AuthSchema(BaseModel):
     id: UUID = Field(default_factory=lambda: uuid4())
     email: EmailStr
     password: str

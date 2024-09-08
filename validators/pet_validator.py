@@ -1,6 +1,6 @@
 from errors.exception_classes import DataValidationError
 from pydantic import ValidationError
-from schemas.pet_schema import Pet
+from schemas.pet_schema import PetSchema
 from typing import Annotated
 from fastapi import Form, UploadFile, File
 
@@ -12,11 +12,11 @@ def validate_data(
         size: Annotated[str, Form(...)] = None,
         age: Annotated[str, Form(...)] = None,
         breed: Annotated[str, Form(...)] = None,
-        weight: Annotated[float, Form(...)] = None,
+        weight: Annotated[str, Form(...)] = 0.0,
         image: Annotated[UploadFile, File()] = None
 ) -> dict:
     try:
-        return Pet(
+        return PetSchema(
             specie=specie,
             gender=gender,
             name=name,

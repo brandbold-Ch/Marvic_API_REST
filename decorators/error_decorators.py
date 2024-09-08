@@ -10,13 +10,15 @@ def handle_exceptions(func: Callable) -> Callable:
         except DataError as e:
             self.session.rollback()
             raise DbInvalidFormatIdError() from e
+
         except IntegrityError as e:
-            print(e)
             self.session.rollback()
             raise DbDuplicatedKeyError() from e
+
         except SQLAlchemyError as e:
             self.session.rollback()
             raise ServerUnknownError(detail=e) from e
+
         finally:
             self.session.close()
     return wrapper

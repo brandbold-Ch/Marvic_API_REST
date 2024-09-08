@@ -2,7 +2,7 @@ from pydantic import BaseModel, field_validator, Field
 from uuid import uuid4, UUID
 
 
-class User(BaseModel):
+class UserSchema(BaseModel):
     id: UUID = Field(default_factory=lambda: uuid4())
     name: str = Field(max_length=50)
     lastname: str = Field(max_length=50)

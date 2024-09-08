@@ -1,14 +1,18 @@
-from errors.exception_classes import InvalidImageTypeError, FilesNotFound, ServerUnknownError
-from route_resolver import get_image_path
 from fastapi import UploadFile
 from io import BytesIO
 from uuid import uuid4
 from PIL import Image
 import os
+from errors.exception_classes import (
+    InvalidImageTypeError,
+    FilesNotFound,
+    ServerUnknownError
+)
 
 
 async def upload_image(image_data: UploadFile) -> str:
     try:
+        print(image_data)
         buffer = await image_data.read()
         image_stream = BytesIO(buffer)
         new_name = str(uuid4())
@@ -18,8 +22,7 @@ async def upload_image(image_data: UploadFile) -> str:
             image.save(webp_stream, format="WEBP")
             webp_stream.seek(0)
 
-            file_path = get_image_path(f"{new_name}.webp")
-            with open(file_path, "wb") as webp_file:
+            with open(f"static/images/{new_name}.webp", "wb") as webp_file:
                 webp_file.write(webp_stream.read())
                 
         return f"{new_name}.webp"
@@ -36,8 +39,7 @@ async def upload_image(image_data: UploadFile) -> str:
 
 def delete_image(image_path: str) -> None:
     try:
-        file_path = get_image_path(image_path)
-        os.remove(file_path)
+        os.remove(f"static/images/{image_path}")
 
     except FileNotFoundError as e:
         raise FilesNotFound(detail=e) from e

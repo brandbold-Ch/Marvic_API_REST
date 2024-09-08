@@ -8,7 +8,7 @@ def load_admin_appt_tmpl(**kwargs) -> str:
         html_chunk: str = ""
 
         with open(
-                get_template_path("admin_appt_tmpl.html"),
+                "static/html/admin_appt_tmpl.html",
                 "r", encoding="utf-8"
         ) as html:
             tags_list = []
@@ -32,13 +32,14 @@ def load_appt_reminder(**kwargs) -> str:
         html_chunk: str = ""
 
         with open(
-            get_template_path("appointment_reminder.html"),
+            "static/html/appointment_reminder.html",
             "r", encoding="utf-8"
         ) as html:
             tags_list = []
 
             for tag in html.readlines():
                 tag = tag.strip().replace("{price}", str(kwargs.get("price")))
+                tag = tag.strip().replace("{time}", str(kwargs.get("time")))
                 tag = tag.strip().replace("{user_name}", str(kwargs.get("user")))
                 tag = tag.strip().replace("{pet_name}", str(kwargs.get("pet")))
                 tag = tag.strip().replace("{issue}", str(kwargs.get("issue")))

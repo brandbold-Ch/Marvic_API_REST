@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, UUID, ForeignKey
-from schemas.auth_schema import Auth
+from schemas.auth_schema import AuthSchema
 from .admin_model import AdminModel
 from utils.config_orm import Base
 

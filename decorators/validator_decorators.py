@@ -6,6 +6,7 @@ from models.user_model import UserModel
 from models.auth_model import AuthModel
 from fastapi.requests import Request
 from models.pet_model import PetModel
+from datetime import datetime, time
 from typing import Callable
 from functools import wraps
 import bcrypt
@@ -66,10 +67,22 @@ def verify_auth_by_id(_obj, user_id: str, role: str) -> AuthModel:
     return auth
 
 
-def pending_appt_hecker(func: Callable) -> Callable:
+def appointment_checker(func: Callable) -> Callable:
+    @handle_exceptions
     def wrapper(self, **kwargs):
         appt_data = kwargs.get("appointment_data")
         pet_data: PetModel = kwargs.get("object_result")
+        created_at: datetime = appt_data["created_at"]
+        split_timestamp = (created_at
+                           .strftime("%Y-%m-%d %I:%M:%S %p")
+                           .split(" "))
+        formatted_time = (datetime
+                          .strptime(split_timestamp[1], "%H:%M:%S")
+                          .time())
+        range_9 = time(9, 0, 0)
+        range_2 = time(2, 0, 0)
+        range_4 = time(4, 0, 0)
+        range_7 = time(7, 0, 0)
 
         for appointment in pet_data.appointments:
             if (appointment.created_at == appt_data["created_at"].date()
@@ -138,6 +151,7 @@ def verify_pet(_obj, user_id: str, pet_id: str) -> PetModel:
 
     if pet is None:
         raise DbNotFoundError("The pet does not exist 🐶")
+
     if str(pet.user_id) != user_id:
         raise DbNotFoundError(
             "The user does not exist or is not your pet 🤦‍♂️‍🐶"
@@ -157,10 +171,12 @@ def verify_appointment(
     )
     if appointment is None:
         raise DbNotFoundError("The appointment does not exist 📑")
+
     if str(appointment.user_id) != user_id:
         raise DbNotFoundError(
             "The user does not exist or is not related to this appointment 🤦‍♂️📑"
         )
+
     if str(appointment.pet_id) != pet_id:
         raise DbNotFoundError(
             "The pet does not exist or is not related to this quote 🐶📑"
@@ -184,7 +200,8 @@ def entity_validator(
             elif pet:
                 return func(
                     self, **kwargs, object_result=verify_pet(
-                        self, kwargs.get("user_id"), kwargs.get("pet_id")
+                        self, kwargs.get("user_id"),
+                        kwargs.get("pet_id")
                     )
                 )
             elif auth:

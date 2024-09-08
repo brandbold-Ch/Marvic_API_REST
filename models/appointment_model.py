@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Text, String, UUID, Date, ForeignKey, Float, DateTime
+from sqlalchemy import Column, Text, String, UUID, ForeignKey, Float, DateTime
 from utils.config_orm import Base
 
 
@@ -18,8 +18,8 @@ class AppointmentModel(Base):
         return {
             "id": str(self.id),
             "dates": {
-                "creation_date": str(self.created_at),
-                "expiration_date": str(self.timestamp),
+                "creation_date": str(self.created_at.strftime("%Y-%m-%d %I:%M:%S %p")),
+                "expiration_date": str(self.timestamp.strftime("%Y-%m-%d %I:%M:%S %p")),
             },
             "relationships": {
                 "pet_id": str(self.pet_id),

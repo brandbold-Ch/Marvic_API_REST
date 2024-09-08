@@ -27,7 +27,6 @@ async def create_appointment(
         pet_id=pet_id,
         appointment_data=appointment_data
     )
-
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
         content={

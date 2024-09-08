@@ -11,13 +11,13 @@ load_dotenv()
 
 url = URL.create(
     drivername="postgresql",
-    username=os.getenv("USER"),
-    password=os.getenv("PASSWORD"),
-    host=os.getenv("HOST"),
+    username=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    host=os.getenv("DB_HOST"),
     database=os.getenv("DATABASE"),
     port=os.getenv("DB_PORT")
 )
 
-engine = create_engine(os.getenv("URL_DATABASE"))
+engine = create_engine(url)
 SessionLocal: sessionmaker = sessionmaker(bind=engine)
 Base: DeclarativeMeta = declarative_base()

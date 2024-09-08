@@ -15,7 +15,24 @@ services:
       - ./:/Marvic_API_REST
     env_file:
       - .env
+    environment:
+      - URL_REDIS=redis://redis:6379/0
+      - HOST=database
+
+  database:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      - POSTGRES_PASSWORD=Pd6JYU3<keNy=\0~eTQ38r-D?~"1>jfp2~-00;8Z3tS"i7%u.C
+      - POSTGRES_DB=postgres
 
   redis:
     image: redis:latest
     restart: always
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "3456:8080"

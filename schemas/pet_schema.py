@@ -8,7 +8,7 @@ gender_choices: list = ["Macho", "Hembra"]
 size_choices: list = ["Grande", "Chico", "Mediano"]
 
 
-class Pet(BaseModel):
+class PetSchema(BaseModel):
     id: UUID = Field(default_factory=lambda: uuid4())
     name: Optional[str] = Field(max_length=25, default=None)
     specie: str
@@ -16,8 +16,8 @@ class Pet(BaseModel):
     size: Optional[str] = None
     age: Optional[str] = None
     breed: Optional[str] = None
-    weight: Union[Optional[float], Optional[str]] = None
-    image: Union[Optional[str], Optional[UploadFile]] = None
+    weight: Optional[float] = 0.0
+    image: Optional[UploadFile] = None
 
     class Config:
         from_attributes = True

@@ -1,6 +1,6 @@
 from errors.exception_classes import DataValidationError
-from schemas.user_schema import User
-from schemas.auth_schema import Auth
+from schemas.user_schema import UserSchema
+from schemas.auth_schema import AuthSchema
 from pydantic import ValidationError
 from typing import Annotated
 from fastapi import Body
@@ -15,12 +15,12 @@ def validate_create(
 ) -> tuple[dict, dict]:
     try:
         return (
-            User(
+            UserSchema(
                 name=name,
                 lastname=lastname,
                 phone_number=phone_number
             ).model_dump(),
-            Auth(
+            AuthSchema(
                 email=email,
                 password=password,
                 role="USER"
@@ -36,7 +36,7 @@ def validate_update(
         phone_number: Annotated[str, Body(...)]
 ) -> dict:
     try:
-        return User(
+        return UserSchema(
             name=name,
             lastname=lastname,
             phone_number=phone_number

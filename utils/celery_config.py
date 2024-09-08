@@ -7,15 +7,18 @@ load_dotenv()
 
 app = Celery(
     "tasks",
-    broker=os.getenv("REDIS_URL"),
-    backend=os.getenv("REDIS_URL"),
-    include=['tasks.email_task', 'tasks.query_task']
+    broker=os.getenv("URL_REDIS"),
+    backend=os.getenv("URL_REDIS"),
+    include=[
+        "tasks.email_task",
+        "tasks.query_task"
+    ]
 )
 
 app.conf.beat_schedule = {
     "check-task-table": {
         "task": "tasks.query_task.check_table_stack",
-        "schedule": crontab(minute="*/5")
+        "schedule": crontab(minute="*/1")
     },
 }
 
