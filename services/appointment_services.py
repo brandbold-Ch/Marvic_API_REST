@@ -16,26 +16,26 @@ class AppointmentServices:
 
     @entity_validator(pet=True)
     def create_appointment(self, **kwargs) -> dict:
-        print(kwargs)
         appointment_create = AppointmentModel(
             **kwargs.get("appointment_data"),
             pet_id=kwargs.get("pet_id"),
             user_id=kwargs.get("user_id")
         )
+        
         self.session.add(appointment_create)
         self.session.add(StackModel(
             id=uuid4(),
             appointment_id=appointment_create.id
         ))
         self.session.commit()
-
+        
         load_dotenv()
         mail_sender.delay(
             load_admin_appt_tmpl(
                 appt_id=appointment_create.id,
                 issue=appointment_create.issue,
-                created_at=appointment_create.created_at,
-                timestamp=appointment_create.timestamp,
+                created_at=appointment_create.created_at.strftime("%Y-%m-%d %I:%M:%S %p"),
+                timestamp=appointment_create.timestamp.strftime("%Y-%m-%d %I:%M:%S %p"),
                 price=appointment_create.price
             ),
             "Nueva cita agendada",

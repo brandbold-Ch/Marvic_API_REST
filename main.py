@@ -35,8 +35,6 @@ async def crete_tables():
 
 @app.exception_handler(ServerBaseException)
 async def server_base_exception_handler(request: Request, exc: ServerBaseException):
-    print(exc.to_dict())
-
     return JSONResponse(
         status_code=exc.status_code,
         content=exc.to_dict()

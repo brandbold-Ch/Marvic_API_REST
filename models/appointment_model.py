@@ -6,8 +6,8 @@ class AppointmentModel(Base):
 
     __tablename__ = "appointment"
     id = Column(UUID, primary_key=True)
-    created_at = Column(DateTime, nullable=False)
-    timestamp = Column(DateTime, nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False)
+    timestamp = Column(DateTime(timezone=True), nullable=False)
     pet_id = Column(UUID, ForeignKey("pet.id"), nullable=False)
     user_id = Column(UUID, ForeignKey("user.id"), nullable=False)
     issue = Column(Text, nullable=True)

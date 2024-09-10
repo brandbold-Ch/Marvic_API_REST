@@ -1,7 +1,7 @@
 from services.stack_services import StackServices
 from utils.config_orm import SessionLocal
 from tasks.email_task import mail_sender
-from utils.load_statics import load_appt_reminder
+from utils.load_statics import load_reminder_appt_tmpl
 from utils.celery_config import app
 from datetime import datetime
 
@@ -13,20 +13,17 @@ def check_table_stack():
     for record in stack.get_stacks():
         try:
             appt: tuple = stack.get_appointment(record.appointment_id)
-            appt_date, today = appt[0].timestamp.date(), datetime.now().date()
-            formatted_time = appt[0].timestamp.strftime("%I:%M %p")
-            diff = appt_date - today
+            diff = appt[0].timestamp.date() - datetime.now().date()
 
             if diff.days == 1:
                 mail_sender(
-                    load_appt_reminder(
+                    load_reminder_appt_tmpl(
                         issue=appt[0].issue,
                         price=appt[0].price,
-                        timestamp=appt_date,
-                        created_at=appt[0].created_at.date(),
+                        timestamp=appt[0].timestamp.strftime("%Y-%m-%d %I:%M:%S %p"),
+                        created_at=appt[0].created_at.strftime("%Y-%m-%d %I:%M:%S %p"),
                         pet=appt[2].name,
-                        user=appt[1].email,
-                        time=formatted_time
+                        user=appt[1].email
                     ),
                     "Recordatorio de Cita",
                     appt[1].email

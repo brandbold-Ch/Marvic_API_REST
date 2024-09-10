@@ -72,17 +72,6 @@ def appointment_checker(func: Callable) -> Callable:
     def wrapper(self, **kwargs):
         appt_data = kwargs.get("appointment_data")
         pet_data: PetModel = kwargs.get("object_result")
-        created_at: datetime = appt_data["created_at"]
-        split_timestamp = (created_at
-                           .strftime("%Y-%m-%d %I:%M:%S %p")
-                           .split(" "))
-        formatted_time = (datetime
-                          .strptime(split_timestamp[1], "%H:%M:%S")
-                          .time())
-        range_9 = time(9, 0, 0)
-        range_2 = time(2, 0, 0)
-        range_4 = time(4, 0, 0)
-        range_7 = time(7, 0, 0)
 
         for appointment in pet_data.appointments:
             if (appointment.created_at == appt_data["created_at"].date()
@@ -116,8 +105,7 @@ def verify_passwords_for_change(func: Callable) -> Callable:
     @handle_exceptions
     def wrapper(self, **kwargs):
         auth_data: AuthModel = verify_auth_by_id(
-            self, kwargs.get("user_id"),
-            kwargs.get("role")
+            self, kwargs.get("user_id"), kwargs.get("role")
         )
         ctx_password: bytes = kwargs.get("ctx_password").encode("utf-8")
         password: bytes = auth_data.password.encode("utf-8")

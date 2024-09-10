@@ -1,6 +1,4 @@
 from errors.exception_classes import ServerUnknownError
-from route_resolver import get_template_path
-from typing import Any
 
 
 def load_admin_appt_tmpl(**kwargs) -> str:
@@ -27,19 +25,18 @@ def load_admin_appt_tmpl(**kwargs) -> str:
         raise ServerUnknownError(detail=e) from e
 
 
-def load_appt_reminder(**kwargs) -> str:
+def load_reminder_appt_tmpl(**kwargs) -> str:
     try:
         html_chunk: str = ""
 
         with open(
-            "static/html/appointment_reminder.html",
+            "static/html/reminder_appt_tmpl.html",
             "r", encoding="utf-8"
         ) as html:
             tags_list = []
 
             for tag in html.readlines():
                 tag = tag.strip().replace("{price}", str(kwargs.get("price")))
-                tag = tag.strip().replace("{time}", str(kwargs.get("time")))
                 tag = tag.strip().replace("{user_name}", str(kwargs.get("user")))
                 tag = tag.strip().replace("{pet_name}", str(kwargs.get("pet")))
                 tag = tag.strip().replace("{issue}", str(kwargs.get("issue")))

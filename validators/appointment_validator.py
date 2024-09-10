@@ -17,7 +17,7 @@ def validate_create(
         ).model_dump()
 
     except ValidationError as e:
-        raise DataValidationError(e)
+        raise DataValidationError(e) from e
 
     except Exception as e:
         raise ServerUnknownError(detail=e) from e

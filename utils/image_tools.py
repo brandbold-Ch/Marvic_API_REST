@@ -16,15 +16,15 @@ async def upload_image(image_data: UploadFile) -> str:
         buffer = await image_data.read()
         image_stream = BytesIO(buffer)
         new_name = str(uuid4())
-        
+
         with Image.open(image_stream) as image:
             webp_stream = BytesIO()
             image.save(webp_stream, format="WEBP")
             webp_stream.seek(0)
-
+            
             with open(f"static/images/{new_name}.webp", "wb") as webp_file:
                 webp_file.write(webp_stream.read())
-                
+
         return f"{new_name}.webp"
 
     except FileNotFoundError as e:

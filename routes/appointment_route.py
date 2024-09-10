@@ -86,4 +86,4 @@ async def delete_appointment(
         pet_id=pet_id,
         appointment_id=appointment_id
     )
-    return JSONResponse(status_code=204, content=None)
+    return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
