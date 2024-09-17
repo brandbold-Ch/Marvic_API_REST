@@ -12,7 +12,6 @@ from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-
 app = FastAPI(
     title="Clínica Veterinaria Marvic (Al servicio de supermascotas) 🐕‍🦺🐈",
     description="Esta es una API para gestionar citas médicas de mascotas.",
@@ -29,7 +28,7 @@ app.add_middleware(
 
 
 @app.on_event("startup")
-async def crete_tables():
+async def create_tables():
     Base.metadata.create_all(engine)
 
 

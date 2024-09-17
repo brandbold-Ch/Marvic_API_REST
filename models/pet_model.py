@@ -2,7 +2,6 @@ from sqlalchemy import Column, Float, String, UUID, ForeignKey
 from models.image_model import ImageModel
 from sqlalchemy.orm import relationship
 from utils.config_orm import Base
-from dotenv import load_dotenv
 import os
 
 
@@ -31,7 +30,6 @@ class PetModel(Base):
 
     def get_image(self) -> str | None:
         if self.image is not None:
-            load_dotenv()
             return f"{os.getenv('GET_IMAGE_URL')}{self.image.image}"
         return None
 

@@ -1,10 +1,8 @@
 from decorators.validator_decorators import entity_validator, appointment_checker
 from models.appointment_model import AppointmentModel
-from utils.load_statics import load_admin_appt_tmpl
-from tasks.email_task import mail_sender
+from utils.notify_email import notify_admin
 from models.stack_model import StackModel
 from sqlalchemy.orm import Session
-from dotenv import load_dotenv
 from uuid import uuid4
 import os
 
@@ -15,6 +13,7 @@ class AppointmentServices:
         self.session = session
 
     @entity_validator(pet=True)
+    @appointment_checker
     def create_appointment(self, **kwargs) -> dict:
         appointment_create = AppointmentModel(
             **kwargs.get("appointment_data"),
@@ -29,18 +28,14 @@ class AppointmentServices:
         ))
         self.session.commit()
         
-        load_dotenv()
-        mail_sender.delay(
-            load_admin_appt_tmpl(
-                appt_id=appointment_create.id,
-                issue=appointment_create.issue,
-                created_at=appointment_create.created_at.strftime("%Y-%m-%d %I:%M:%S %p"),
-                timestamp=appointment_create.timestamp.strftime("%Y-%m-%d %I:%M:%S %p"),
-                price=appointment_create.price
-            ),
-            "Nueva cita agendada",
-            os.getenv("ADMIN_RECIPIENT_EMAIL")
+        notify_admin(
+            appt_id=appointment_create.id,
+            issue=appointment_create.issue,
+            created_at=appointment_create.created_at.strftime("%Y-%m-%d %I:%M:%S %p"),
+            timestamp=appointment_create.timestamp.strftime("%Y-%m-%d %I:%M:%S %p"),
+            price=appointment_create.price
         )
+        
         return appointment_create.to_dict()
 
     @entity_validator(appointment=True)
@@ -50,9 +45,7 @@ class AppointmentServices:
 
     @entity_validator(pet=True)
     def get_appointments(self, **kwargs) -> list[dict]:
-        appointments: list[AppointmentModel] = kwargs.get(
-            "object_result"
-        ).appointments
+        appointments: list[AppointmentModel] = kwargs.get("object_result").appointments
         return [appointment.to_dict() for appointment in appointments]
 
     @entity_validator(appointment=True)

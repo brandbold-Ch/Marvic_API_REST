@@ -1,8 +1,8 @@
 from errors.exception_classes import DataValidationError
-from pydantic import ValidationError
-from schemas.pet_schema import PetSchema
-from typing import Annotated
 from fastapi import Form, UploadFile, File
+from schemas.pet_schema import PetSchema
+from pydantic import ValidationError
+from typing import Annotated
 
 
 def validate_data(

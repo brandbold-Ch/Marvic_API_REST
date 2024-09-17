@@ -1,12 +1,9 @@
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from errors.exception_classes import ExpiredTokenError, InvalidTokenError, NotFoundTokenError
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
 from jose import JWTError, jwt
 from fastapi import Request
 import os
-
-load_dotenv()
 
 
 class CustomHTTPBearer(HTTPBearer):

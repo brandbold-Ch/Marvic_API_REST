@@ -1,63 +1,110 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recordatorio de Cita Programada</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Lora:wght@400&display=swap">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Lora', serif;
             color: #333;
-            background-color: #f9f9f9;
+            background-color: #f1f8f9;
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
+
         .container {
             max-width: 600px;
-            margin: 0 auto;
+            margin: 30px auto;
             background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            text-align: left;
+            /* Align text to the left */
+        }
+
+        .header {
+            background-color: rgb(229, 7, 144);
+            /* Rosa brillante */
+            color: #ffffff;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px 12px 0 0;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 20px;
+            /* Space between header and content */
+            text-align: left;
+            /* Align text to the left */
         }
-        h1 {
-            color: #2c3e50;
-            font-size: 24px;
+
+        .header h1 {
+            font-size: 30px;
+            font-weight: 700;
+            margin: 0;
         }
+
         p {
-            font-size: 16px;
-            line-height: 1.5;
-            margin: 10px 0;
+            font-size: 18px;
+            line-height: 1.6;
+            margin: 15px 0;
         }
+
         ul {
             list-style-type: none;
             padding: 0;
         }
+
         ul li {
-            background-color: #f4f4f4;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 6px solid rgb(220, 222, 33);
+            /* Amarillo claro */
         }
+
         strong {
-            color: #34495e;
+            color: rgb(229, 7, 144);
+            /* Rosa brillante */
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
         }
+
         .footer {
-            margin-top: 20px;
-            font-size: 14px;
+            margin-top: 30px;
+            font-size: 16px;
             color: #777;
             text-align: center;
         }
+
         .footer p {
             margin: 5px 0;
         }
+
+        .logo {
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            display: none;
+            /* Hide the image */
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h1>Recordatorio de Próxima Cita para {pet_name}</h1>
+        <div class="header">
+            <h1>Recordatorio de Próxima Cita para {pet_name}</h1>
+        </div>
+        <!-- Image section removed -->
         <p>Hola {user_name},</p>
-        <p>Este es un recordatorio de que tienes una cita programada para **mañana**. Aquí están los detalles:</p>
+        <p>Este es un recordatorio de que tienes una cita programada. Aquí están los detalles:</p>
         <ul>
             <li><strong>Asunto:</strong> {issue}</li>
             <li><strong>Fecha de la Cita:</strong> {timestamp}</li>

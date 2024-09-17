@@ -35,5 +35,8 @@ class StackServices:
         appt = self.session.get(AppointmentModel, appointment_id)
         pet = self.session.get(PetModel, appt.pet_id)
         auth = verify_auth_by_id(self, pet.user_id, "USER")
-
-        return appt, auth, pet
+        
+    @handle_exceptions
+    def update_appointment(self, appt_obj: AppointmentModel) -> None:
+        self.session.add(appt_obj)
+        self.session.commit()

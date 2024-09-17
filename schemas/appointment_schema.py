@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime, time
-from uuid import UUID, uuid4
 from zoneinfo import ZoneInfo
 from datetime import datetime
+from uuid import UUID, uuid4
 
 status_choices = ["pending", "completed", "canceled"]
 
@@ -16,6 +16,7 @@ class AppointmentSchema(BaseModel):
     issue: str = None
     status: str = Field(default="pending")
     price: float = Field(default=0.0, validate_default=True)
+    expired: bool = Field(default=False)
 
     class Config:
         from_attributes = True
@@ -39,7 +40,3 @@ class AppointmentSchema(BaseModel):
         else:
             price = 500
             return price
-    
-    @field_validator("timestamp", mode="after")
-    def timestamp_validator(cls, timestamp: datetime):
-        return timestamp

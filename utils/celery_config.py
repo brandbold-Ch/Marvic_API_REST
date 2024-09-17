@@ -1,9 +1,6 @@
 from celery.schedules import crontab
-from dotenv import load_dotenv
 from celery import Celery
 import os
-
-load_dotenv()
 
 app = Celery(
     "tasks",
@@ -18,7 +15,7 @@ app = Celery(
 app.conf.beat_schedule = {
     "check-task-table": {
         "task": "tasks.query_task.check_table_stack",
-        "schedule": crontab(minute="*/20")
+        "schedule": crontab(hour=21, minute=0)
     },
 }
 

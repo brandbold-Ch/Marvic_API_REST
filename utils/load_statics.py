@@ -12,6 +12,7 @@ def load_admin_appt_tmpl(**kwargs) -> str:
             tags_list = []
 
             for tag in html.readlines():
+                tag = tag.strip().replace("{admin}", str(kwargs.get("admin")))
                 tag = tag.strip().replace("{id}", str(kwargs.get("appt_id")))
                 tag = tag.strip().replace("{issue}", str(kwargs.get("issue")))
                 tag = tag.strip().replace("{created_at}", str(kwargs.get("created_at")))

@@ -4,9 +4,9 @@ from utils.token_tools import verify_token
 from models.admin_model import AdminModel
 from models.user_model import UserModel
 from models.auth_model import AuthModel
-from fastapi.requests import Request
 from models.pet_model import PetModel
-from datetime import datetime, time
+from fastapi.requests import Request
+from sqlalchemy import and_, or_
 from typing import Callable
 from functools import wraps
 import bcrypt
@@ -14,6 +14,7 @@ import re
 from errors.exception_classes import (
     DbNotFoundError,
     DuplicatedAppointmentError,
+    BusyAppointmentError,
     PasswordDoNotMatchError,
     DataValidationError,
     IncorrectUserError
@@ -71,12 +72,19 @@ def appointment_checker(func: Callable) -> Callable:
     @handle_exceptions
     def wrapper(self, **kwargs):
         appt_data = kwargs.get("appointment_data")
-        pet_data: PetModel = kwargs.get("object_result")
+        pet_data = kwargs.get("object_result")
 
-        for appointment in pet_data.appointments:
-            if (appointment.created_at == appt_data["created_at"].date()
-                    and appointment.status == "pending"):
+        conflicting_appointments = (self.session
+            .query(AppointmentModel)
+            .where(AppointmentModel.expired == False)
+        ).all()
+
+        for appointment in conflicting_appointments:            
+            if appointment.pet_id == pet_data.id:
                 raise DuplicatedAppointmentError()
+            
+            if appointment.timestamp == appt_data["timestamp"]:
+                raise BusyAppointmentError()
 
         return func(self, **kwargs)
     return wrapper
@@ -133,7 +141,6 @@ def verify_admin(_obj, admin_id: str) -> AdminModel:
         raise DbNotFoundError("The admin does not exist 🤦️")
     return admin
 
-
 def verify_pet(_obj, user_id: str, pet_id: str) -> PetModel:
     pet: PetModel = _obj.session.get(PetModel, pet_id)
 
@@ -176,6 +183,7 @@ def entity_validator(
         auth: bool = False,
         user: bool = False,
         pet: bool = False,
+        admin: bool = False,
         appointment: bool = False
 ) -> Callable:
     def decorator(func: Callable):
@@ -206,6 +214,13 @@ def entity_validator(
                         kwargs.get("appointment_id")
                     )
                 )
+            elif admin:
+                return func(
+                    self, **kwargs, object_result=verify_admin(
+                        self, kwargs.get("admin_id")
+                    )
+                )
+                
             return func(self, **kwargs)
         return wrapper
     return decorator
@@ -216,9 +231,17 @@ def authenticate(func: Callable) -> Callable:
     async def wrapper(*args, **kwargs):
         request: Request = kwargs.get("request")
         user_req: dict = verify_token(request.headers.get("authorization")[7:])
-
-        if user_req["user_id"] == kwargs.get("user_id"):
-            return await func(*args, **kwargs)
-        else:
-            raise IncorrectUserError()
+        
+        match user_req["role"]:
+            case "USER":
+                if user_req["user_id"] == kwargs.get("user_id"):
+                    return await func(*args, **kwargs)
+                else:
+                    raise IncorrectUserError()
+            
+            case "ADMINISTRATOR":
+                if user_req["user_id"] == kwargs.get("admin_id"):
+                    return await func(*args, **kwargs)
+                else:
+                    raise IncorrectUserError()
     return wrapper

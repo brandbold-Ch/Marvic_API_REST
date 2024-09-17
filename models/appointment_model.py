@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Text, String, UUID, ForeignKey, Float, DateTime
+from sqlalchemy import Column, Text, String, UUID, ForeignKey, Float, DateTime, Boolean
 from utils.config_orm import Base
 
 
@@ -13,6 +13,7 @@ class AppointmentModel(Base):
     issue = Column(Text, nullable=True)
     status = Column(String(10), nullable=False)
     price = Column(Float, nullable=True)
+    expired = Column(Boolean, nullable=False)
 
     def to_dict(self) -> dict:
         return {
@@ -28,6 +29,7 @@ class AppointmentModel(Base):
             "details": {
                 "issue": self.issue,
                 "status": self.status,
-                "price": self.price
+                "price": self.price,
+                "expired": self.expired
             }
         }

@@ -15,6 +15,10 @@ class AdminModel(Base):
         uselist=False,
         cascade="all, delete"
     )
+    
+    def update_fields(self, **kwargs):
+        for name, value in kwargs.items():
+            setattr(self, name, value)
 
     def to_dict(self) -> dict:
         return {

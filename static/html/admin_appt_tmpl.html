@@ -1,69 +1,104 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notificación de Nueva Cita</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Lora:wght@400&display=swap">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Lora', serif;
             color: #333;
-            background-color: #f9f9f9;
+            background-color: #f1f8f9;
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
+
         .container {
             max-width: 600px;
-            margin: 0 auto;
+            margin: 30px auto;
             background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            text-align: left;
+            /* Align text to the left */
+        }
+
+        .header {
+            background-color: rgb(229, 7, 144);
+            /* Rosa brillante */
+            color: #ffffff;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px 12px 0 0;
+            font-family: 'Montserrat', sans-serif;
+            text-align: left;
+            /* Align text to the left */
         }
-        h1 {
-            color: #2c3e50;
-            font-size: 24px;
+
+        .header h1 {
+            font-size: 30px;
+            font-weight: 700;
+            margin: 0;
         }
+
         p {
-            font-size: 16px;
-            line-height: 1.5;
-            margin: 10px 0;
+            font-size: 18px;
+            line-height: 1.6;
+            margin: 15px 0;
         }
+
         ul {
             list-style-type: none;
             padding: 0;
         }
+
         ul li {
-            background-color: #f4f4f4;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 6px solid rgb(220, 222, 33);
+            /* Amarillo claro */
         }
+
         strong {
-            color: #34495e;
+            color: rgb(229, 7, 144);
+            /* Rosa brillante */
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
         }
+
         .footer {
-            margin-top: 20px;
-            font-size: 14px;
+            margin-top: 30px;
+            font-size: 16px;
             color: #777;
             text-align: center;
         }
+
         .footer p {
             margin: 5px 0;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h1>¡Nueva Cita Creada!</h1>
-        <p>Hola Administrador,</p>
+        <div class="header">
+            <h1>¡Nueva Cita Creada!</h1>
+        </div>
+        <p>Hola {admin},</p>
         <p>Se ha creado una nueva cita. Aquí están los detalles:</p>
         <ul>
             <li><strong>Id de cita:</strong> {id}</li>
             <li><strong>Asunto:</strong> {issue}</li>
-            <li><strong>Fecha de creación:</strong> {created_at}</li>
+            <li><strong>Fecha de Creación:</strong> {created_at}</li>
             <li><strong>Fecha de la Cita:</strong> {timestamp}</li>
-            <li><strong>Price:</strong> {price}</li>
+            <li><strong>Precio:</strong> {price}</li>
         </ul>
         <p>Por favor, revisa los detalles y asegúrate de que todo esté en orden.</p>
         <p>Saludos,<br>El sistema de gestión de citas</p>

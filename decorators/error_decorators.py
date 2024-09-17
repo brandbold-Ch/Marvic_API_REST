@@ -1,6 +1,10 @@
-from errors.exception_classes import DbInvalidFormatIdError, DbDuplicatedKeyError, ServerUnknownError
 from sqlalchemy.exc import IntegrityError, DataError, SQLAlchemyError
 from typing import Callable
+from errors.exception_classes import (
+    DbInvalidFormatIdError, 
+    DbDuplicatedKeyError, 
+    ServerUnknownError
+)
 
 
 def handle_exceptions(func: Callable) -> Callable:

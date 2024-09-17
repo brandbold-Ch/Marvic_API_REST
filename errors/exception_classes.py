@@ -57,7 +57,7 @@ class DbInvalidFormatIdError(ServerBaseException):
 
 
 class DataValidationError(ServerBaseException):
-    def __init__(self, message="There are errors in the fields ⚠️") -> None:
+    def __init__(self, message="There are errors in the fields 🚫") -> None:
         super().__init__(message)
         self.add_note("""
             Alguno de los campos no tiene el tipo correcto.
@@ -165,6 +165,20 @@ class DuplicatedAppointmentError(ServerBaseException):
             Hay una cita pendiente, no puedes hacer otra hasta completar la anterior.
         """)
         self.error_code = error_codes["DUPLICATED_APPOINTMENT"]
+        self.status_code = status_codes["BAD_REQUEST"]
+        self.http_argument = "Bad Request ❓"
+        
+
+class BusyAppointmentError(ServerBaseException):
+    def __init__(
+            self,
+            message="There is already an appointment created for that time, please choose another time. 🤡"
+    ) -> None:
+        super().__init__(message)
+        self.add_note("""
+            Hay una cita con esa horario, elige otro.
+        """)
+        self.error_code = error_codes["BUSY_APPOINTMENT"]
         self.status_code = status_codes["BAD_REQUEST"]
         self.http_argument = "Bad Request ❓"
 

@@ -1,5 +1,5 @@
 from errors.exception_classes import DataValidationError
-from schemas.user_schema import UserSchema
+from schemas.admin_schema import AdminSchema
 from schemas.auth_schema import AuthSchema
 from pydantic import ValidationError
 from typing import Annotated
@@ -7,40 +7,40 @@ from fastapi import Body
 
 
 def validate_create(
-        name: Annotated[str, Body(...)],
-        lastname: Annotated[str, Body(...)],
-        phone_number: Annotated[str, Body(...)],
-        email: Annotated[str, Body(...)],
-        password: Annotated[str, Body(...)]
-) -> tuple[dict, dict]:
+    name: str,
+    lastname: str,
+    email: str,
+    password: str,
+    occupation: str = None,
+) -> dict[dict, dict]:
     try:
         return (
-            UserSchema(
+            AdminSchema(
                 name=name,
                 lastname=lastname,
-                phone_number=phone_number
+                occupation=occupation
             ).model_dump(),
             AuthSchema(
                 email=email,
                 password=password,
-                role="USER"
+                role="ADMINISTRATOR"
             ).model_dump()
         )
+        
     except ValidationError as e:
         raise DataValidationError(e) from e
 
-
 def validate_update(
-        name: Annotated[str, Body(...)],
-        lastname: Annotated[str, Body(...)],
-        phone_number: Annotated[str, Body(...)]
+    name: Annotated[str, Body(...)],
+    lastname: Annotated[str, Body(...)],
+    occupation: Annotated[str, Body(...)] = None
 ) -> dict:
     try:
-        return UserSchema(
+        return AdminSchema(
             name=name,
             lastname=lastname,
-            phone_number=phone_number
+            occupation=occupation
         ).model_dump()
-
+        
     except ValidationError as e:
         raise DataValidationError(e) from e

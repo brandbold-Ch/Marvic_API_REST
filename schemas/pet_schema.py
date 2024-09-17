@@ -1,7 +1,7 @@
 from pydantic import BaseModel, field_validator, Field
-from typing import Optional, Union
 from fastapi import UploadFile
 from uuid import uuid4, UUID
+from typing import Optional
 
 specie_choices: list = ["Gato", "Perro", "Otro"]
 gender_choices: list = ["Macho", "Hembra"]

@@ -25,17 +25,16 @@ class AuthServices:
 
         return auth_update.to_dict()
 
-    def recover_password(self) -> None:
-        pass
-
     @verify_passwords_for_login
     def auth_login(self,  **kwargs) -> dict:
         auth_data: AuthModel = kwargs.get("object_result")
+        ctx_id = str(auth_data.user_id) if auth_data.user_id is not None else str(auth_data.admin_id)
+        
         return {
             "token": create_token({
-                "user_id": str(auth_data.user_id),
+                "user_id": ctx_id,
                 "role": auth_data.role
             }),
-            "user_id": str(auth_data.user_id),
+            "user_id": ctx_id,
             "role": auth_data.role
         }
