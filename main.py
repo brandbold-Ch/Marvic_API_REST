@@ -12,6 +12,7 @@ from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
+
 app = FastAPI(
     title="Clínica Veterinaria Marvic (Al servicio de supermascotas) 🐕‍🦺🐈",
     description="Esta es una API para gestionar citas médicas de mascotas.",
@@ -38,6 +39,7 @@ async def server_base_exception_handler(request: Request, exc: ServerBaseExcepti
         status_code=exc.status_code,
         content=exc.to_dict()
     )
+
 
 pet_routes.include_router(appointment_routes, prefix="/{pet_id}/appointments", tags=["User Controllers"])
 user_routes.include_router(pet_routes, prefix="/{user_id}/pets", tags=["User Controllers"])

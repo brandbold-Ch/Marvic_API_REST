@@ -32,9 +32,11 @@ class StackServices:
 
     @handle_exceptions
     def get_appointment(self, appointment_id: str) -> tuple:
-        appt = self.session.get(AppointmentModel, appointment_id)
-        pet = self.session.get(PetModel, appt.pet_id)
-        auth = verify_auth_by_id(self, pet.user_id, "USER")
+        appointment_data = self.session.get(AppointmentModel, appointment_id)
+        pet_data = self.session.get(PetModel, appointment_data.pet_id)
+        auth_data = verify_auth_by_id(self, pet_data.user_id, "USER")
+        
+        return appointment_data, pet_data, auth_data
         
     @handle_exceptions
     def update_appointment(self, appt_obj: AppointmentModel) -> None:

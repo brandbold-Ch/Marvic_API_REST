@@ -38,8 +38,8 @@ def load_reminder_appt_tmpl(**kwargs) -> str:
 
             for tag in html.readlines():
                 tag = tag.strip().replace("{price}", str(kwargs.get("price")))
-                tag = tag.strip().replace("{user_name}", str(kwargs.get("user")))
-                tag = tag.strip().replace("{pet_name}", str(kwargs.get("pet")))
+                tag = tag.strip().replace("{user_name}", str(kwargs.get("user_name")))
+                tag = tag.strip().replace("{pet_name}", str(kwargs.get("pet_name")))
                 tag = tag.strip().replace("{issue}", str(kwargs.get("issue")))
                 tag = tag.strip().replace("{timestamp}", str(kwargs.get("timestamp")))
                 tag = tag.strip().replace("{created_at}", str(kwargs.get("created_at")))

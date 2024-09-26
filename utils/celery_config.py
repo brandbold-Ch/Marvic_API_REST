@@ -15,7 +15,7 @@ app = Celery(
 app.conf.beat_schedule = {
     "check-task-table": {
         "task": "tasks.query_task.check_table_stack",
-        "schedule": crontab(hour=21, minute=0)
+        "schedule": crontab(minute=0, hour=12)
     },
 }
 

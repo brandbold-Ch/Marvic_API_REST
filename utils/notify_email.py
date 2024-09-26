@@ -30,10 +30,10 @@ def notify_user(**kwargs) -> None:
             price=kwargs.get("price"),
             timestamp=kwargs.get("timestamp"),
             created_at=kwargs.get("created_at"),
-            pet=kwargs.get("pet"),
-            user=kwargs.get("user")
+            pet_name=kwargs.get("pet_name"),
+            user_name=kwargs.get("user_email")
         ),
         "Recordatorio de Cita",
-        kwargs.get("addressee")
+        kwargs.get("user_email")
     )
     

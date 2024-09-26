@@ -79,7 +79,7 @@ def appointment_checker(func: Callable) -> Callable:
             .where(AppointmentModel.expired == False)
         ).all()
 
-        for appointment in conflicting_appointments:            
+        for appointment in conflicting_appointments:        
             if appointment.pet_id == pet_data.id:
                 raise DuplicatedAppointmentError()
             
