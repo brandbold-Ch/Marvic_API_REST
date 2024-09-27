@@ -1,4 +1,3 @@
-from decorators.validator_decorators import entity_validator
 from decorators.error_decorators import handle_exceptions
 from models.appointment_model import AppointmentModel
 from errors.exception_classes import DbNotFoundError
@@ -7,6 +6,11 @@ from models.admin_model import AdminModel
 from models.auth_model import AuthModel
 from models.user_model import UserModel
 from models.pet_model import PetModel
+from decorators.validator_decorators import (
+    entity_validator, 
+    verify_auth_by_email
+)
+import bcrypt
 
 
 class AdminServices:
@@ -91,3 +95,18 @@ class AdminServices:
         if appointment is None:
             raise DbNotFoundError("The appointment does not exist 📑")
         return appointment.to_dict()
+    
+    @handle_exceptions
+    def change_password_to_user(self, **kwargs) -> dict:
+        auth_update: AuthModel = verify_auth_by_email(
+            self, kwargs.get("email")
+        )
+        auth_update.password = bcrypt.hashpw(
+            kwargs.get("new_password").encode("utf-8"),
+            bcrypt.gensalt(12)
+        ).decode("utf-8")
+        self.session.add(auth_update)
+        self.session.commit()
+
+        return auth_update.to_dict()
+    

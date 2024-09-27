@@ -4,7 +4,6 @@ from utils.notify_email import notify_admin
 from models.stack_model import StackModel
 from sqlalchemy.orm import Session
 from uuid import uuid4
-import os
 
 
 class AppointmentServices:

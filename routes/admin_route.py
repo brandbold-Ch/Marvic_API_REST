@@ -1,14 +1,13 @@
 from validators.admin_validator import validate_update, validate_create
 from controllers.admin_controller import AdminControllers
 from decorators.validator_decorators import authenticate
+from fastapi import Depends, status, Body, Query
 from utils.token_tools import CustomHTTPBearer
 from fastapi.responses import JSONResponse
 from utils.config_orm import SessionLocal
 from fastapi.requests import Request
 from fastapi import APIRouter, Path
 from typing import Annotated
-from fastapi import Depends
-from fastapi import status
 
 
 admin = APIRouter()
@@ -115,7 +114,29 @@ async def get_user(
         content=admin_controller.get_user(user_id)
     )
 
-
+@admin.put("/{admin_id}/users/{user_id}", dependencies=[Depends(bearer)])
+@authenticate
+async def change_password_to_user(
+    request: Request,
+    admin_id: Annotated[str, Path(max_length=36)],
+    new_password: Annotated[str, Body(...)],
+    email: Annotated[str, Body(...)]
+) -> JSONResponse:    
+    return JSONResponse(
+        status_code=status.HTTP_202_ACCEPTED,
+        content={
+            "status": "Accepted 🤝",
+            "message": "Updated auth for user✅",
+            "codes": {
+                "status_code": status.HTTP_202_ACCEPTED,
+            },
+            "data": admin_controller.change_password_to_user(
+                new_password=new_password,
+                email=email,
+            )
+        }
+    )
+    
 @admin.get("/{admin_id}/pets/{pet_id}", dependencies=[Depends(bearer)])
 @authenticate
 async def get_pet(
@@ -140,4 +161,3 @@ async def get_appointment(
         status_code=status.HTTP_200_OK,
         content=admin_controller.get_appointment(appointment_id)
     )
-    

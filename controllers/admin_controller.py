@@ -33,3 +33,6 @@ class AdminControllers:
     
     def get_appointment(self, appointment_id: str) -> dict:
         return self.admin.get_appointment(appointment_id)
+    
+    def change_password_to_user(self, **kwargs) -> dict:
+        return self.admin.change_password_to_user(**kwargs)

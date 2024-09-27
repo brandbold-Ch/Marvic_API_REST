@@ -6,7 +6,6 @@ from models.user_model import UserModel
 from models.auth_model import AuthModel
 from models.pet_model import PetModel
 from fastapi.requests import Request
-from sqlalchemy import and_, or_
 from typing import Callable
 from functools import wraps
 import bcrypt

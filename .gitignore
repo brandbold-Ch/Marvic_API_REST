@@ -181,3 +181,4 @@ vercel.json
 pylint.rc
 Pipfile
 celerybeat-schedule
+/static/images
