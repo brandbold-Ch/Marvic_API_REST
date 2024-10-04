@@ -140,6 +140,7 @@ def verify_admin(_obj, admin_id: str) -> AdminModel:
         raise DbNotFoundError("The admin does not exist 🤦️")
     return admin
 
+
 def verify_pet(_obj, user_id: str, pet_id: str) -> PetModel:
     pet: PetModel = _obj.session.get(PetModel, pet_id)
 
@@ -230,7 +231,7 @@ def authenticate(func: Callable) -> Callable:
     async def wrapper(*args, **kwargs):
         request: Request = kwargs.get("request")
         user_req: dict = verify_token(request.headers.get("authorization")[7:])
-        
+
         match user_req["role"]:
             case "USER":
                 if user_req["user_id"] == kwargs.get("user_id"):
@@ -239,8 +240,9 @@ def authenticate(func: Callable) -> Callable:
                     raise IncorrectUserError()
             
             case "ADMINISTRATOR":
-                if user_req["user_id"] == kwargs.get("admin_id"):
+                if user_req["user_id"] == (kwargs.get("user_id") or kwargs.get("admin_id")):
                     return await func(*args, **kwargs)
                 else:
                     raise IncorrectUserError()
     return wrapper
+ 

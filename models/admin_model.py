@@ -28,7 +28,7 @@ class AdminModel(Base):
             "occupation": self.occupation,
             "auth_data": {
                 "id": str(self.auth.id),
-                "user_id": str(self.auth.user_id),
+                "admin_id": str(self.auth.admin_id),
                 "email": self.auth.email,
                 "password": self.auth.password,
                 "role": self.auth.role

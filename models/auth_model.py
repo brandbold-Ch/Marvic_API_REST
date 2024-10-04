@@ -21,6 +21,7 @@ class AuthModel(Base):
         return {
             "id": str(self.id),
             "user_id": str(self.user_id),
+            "admin_id": str(self.admin_id),
             "email": self.email,
             "password": self.password,
             "role": self.role

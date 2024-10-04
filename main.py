@@ -1,3 +1,9 @@
+from models.user_model import UserModel
+from models.admin_model import AdminModel
+from models.auth_model import AuthModel
+from models.pet_model import PetModel
+from models.image_model import ImageModel
+from models.appointment_model import AppointmentModel
 from errors.exception_classes import ServerBaseException
 from routes.appointment_route import appointment_routes
 from starlette.responses import FileResponse
@@ -11,7 +17,7 @@ from fastapi import FastAPI, status
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-
+from errors.exception_classes import FilesNotFound
 
 app = FastAPI(
     title="Clínica Veterinaria Marvic (Al servicio de supermascotas) 🐕‍🦺🐈",
@@ -50,7 +56,10 @@ app.include_router(auth_routes, prefix="/api/v1/auth", tags=["Auth Controllers"]
 
 @app.get("/image/{image_name}")
 async def images(image_name=Path(max_length=41)) -> FileResponse:
-    return FileResponse(f"static/images/{image_name}", media_type="image/webp")
+    try:
+        return FileResponse(f"static/images/{image_name}", media_type="image/webp")
+    except:
+        raise FilesNotFound()
 
 
 @app.get("/")

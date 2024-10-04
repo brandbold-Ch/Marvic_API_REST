@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Float, String, UUID, ForeignKey
-from models.image_model import ImageModel
 from sqlalchemy.orm import relationship
 from utils.config_orm import Base
 import os

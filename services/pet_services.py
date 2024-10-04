@@ -1,5 +1,7 @@
 from decorators.validator_decorators import entity_validator
+from decorators.error_decorators import handle_exceptions
 from utils.image_tools import upload_image, delete_image
+from errors.exception_classes import FilesNotFound
 from sqlalchemy.orm.session import Session
 from models.image_model import ImageModel
 from models.pet_model import PetModel
@@ -66,3 +68,17 @@ class PetServices:
         if pet_delete.get_image() is not None:
             image = pet_delete.get_image().split("/")
             delete_image(image[-1])
+            
+    @handle_exceptions
+    def delete_image(self, **kwargs) -> None:
+        image_delete = (self.session
+            .query(ImageModel)
+            .where(ImageModel.pet_id == kwargs.get("pet_id"))
+        ).first()
+        
+        if image_delete is None:
+            raise FilesNotFound()
+        
+        self.session.delete(image_delete)
+        self.session.commit()
+        delete_image(image_delete.image)

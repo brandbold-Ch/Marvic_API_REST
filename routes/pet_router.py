@@ -102,3 +102,14 @@ async def delete_pet(
         user_id=user_id, pet_id=pet_id
     )
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
+
+
+@pet_routes.delete("/{pet_id}/image", dependencies=[Depends(bearer)])
+@authenticate
+async def delete_image(
+    request: Request,
+    user_id: Annotated[str, Path(max_length=36)],
+    pet_id: Annotated[str, Path(max_length=36)]
+) -> JSONResponse:
+    pet_controller.delete_image(pet_id=pet_id)
+    return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)

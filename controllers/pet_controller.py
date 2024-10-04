@@ -21,3 +21,6 @@ class PetController:
 
     def delete_pet(self, **kwargs) -> None:
         self.pet.delete_pet(**kwargs)
+
+    def delete_image(self, **kwargs) -> None:
+        self.pet.delete_image(**kwargs)

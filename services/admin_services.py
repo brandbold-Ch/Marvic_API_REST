@@ -1,8 +1,11 @@
+from models.medical_history_model import MedicalHistoryModel
+from decorators.validator_decorators import entity_validator
 from decorators.error_decorators import handle_exceptions
 from models.appointment_model import AppointmentModel
-from errors.exception_classes import DbNotFoundError
+from utils.image_tools import upload_image
 from sqlalchemy.orm.session import Session
 from models.admin_model import AdminModel
+from models.image_model import ImageModel
 from models.auth_model import AuthModel
 from models.user_model import UserModel
 from models.pet_model import PetModel
@@ -10,8 +13,13 @@ from decorators.validator_decorators import (
     entity_validator, 
     verify_auth_by_email
 )
+from errors.exception_classes import (
+    DbNotFoundError, 
+    DataValidationError, 
+    DuplicatedMedicalHistory
+)
 import bcrypt
-
+from uuid import uuid4
 
 class AdminServices:
 
@@ -94,7 +102,15 @@ class AdminServices:
 
         if appointment is None:
             raise DbNotFoundError("The appointment does not exist 📑")
-        return appointment.to_dict()
+        
+        user = self.session.get(UserModel, appointment.user_id)
+        pet = self.session.get(PetModel, appointment.pet_id)
+        
+        return {
+            "appointment_data": appointment.to_dict(),
+            "pet_data": pet.to_dict(),
+            "user_data": user.to_dict()
+        }
     
     @handle_exceptions
     def change_password_to_user(self, **kwargs) -> dict:
@@ -110,3 +126,56 @@ class AdminServices:
 
         return auth_update.to_dict()
     
+    async def create_medical_history(self, **kwargs) -> dict:
+        appt = kwargs.get("appointment_id")
+        appointment = self.session.get(AppointmentModel, appt)
+
+        if appointment is None:
+            raise DbNotFoundError("The appointment does not exist 📑")
+        
+        validation_items = (self.session
+            .query(MedicalHistoryModel)
+            .where(MedicalHistoryModel.appointment_id == appt)
+        ).all()
+        
+        if len(validation_items) == 1:
+            raise DuplicatedMedicalHistory()
+                
+        medical_history_create = MedicalHistoryModel(
+            id=uuid4(),
+            appointment_id=appt,
+            issue=kwargs.get("issue")
+        )
+        self.session.add(medical_history_create)
+        self.session.commit()
+        
+        if kwargs.get("images") is not None:
+            for image in kwargs.get("images"):
+                image_path = await upload_image(image)
+                self.session.add(
+                    ImageModel(
+                        id=uuid4(), 
+                        image=image_path,
+                        medical_history_id=medical_history_create.id
+                    )
+                )
+                self.session.commit()
+        
+        return medical_history_create.to_dict()
+        
+    @handle_exceptions
+    def update_appointment(self, appointment_id: str, state: str) -> dict:
+        appointment_update = self.session.get(AppointmentModel, appointment_id)
+        status_choices = ["pending", "completed", "canceled"]
+
+        if appointment_update is None:
+            raise DbNotFoundError("The appointment does not exist 📑")
+        
+        elif state in status_choices:
+            appointment_update.status = state
+            self.session.add(appointment_update)
+            self.session.commit()
+            
+            return appointment_update.to_dict()
+        
+        raise DataValidationError(detail="must be [pending, completed, cancelled]")

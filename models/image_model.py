@@ -8,7 +8,7 @@ class ImageModel(Base):
     id = Column(UUID, primary_key=True)
     image = Column(String(70), nullable=False)
     pet_id = Column(UUID, ForeignKey("pet.id"), nullable=True, unique=True)
-    medical_history_id = Column(UUID, nullable=True)
+    medical_history_id = Column(UUID, ForeignKey("medical_history.id"), nullable=True)
     
     def to_dict(self) -> dict:
         return {

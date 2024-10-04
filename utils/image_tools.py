@@ -12,7 +12,6 @@ from errors.exception_classes import (
 
 async def upload_image(image_data: UploadFile) -> str:
     try:
-        print(image_data)
         buffer = await image_data.read()
         image_stream = BytesIO(buffer)
         new_name = str(uuid4())

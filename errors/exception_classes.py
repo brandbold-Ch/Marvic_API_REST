@@ -57,10 +57,10 @@ class DbInvalidFormatIdError(ServerBaseException):
 
 
 class DataValidationError(ServerBaseException):
-    def __init__(self, message="There are errors in the fields 🚫") -> None:
+    def __init__(self, message="There are errors in the fields 🚫", detail=None) -> None:
         super().__init__(message)
-        self.add_note("""
-            Alguno de los campos no tiene el tipo correcto.
+        self.add_note(f"""
+            Alguno de los campos no tiene el tipo correcto. {detail}
         """)
         self.error_code = error_codes["ERROR_DATA_VALIDATION"]
         self.status_code = status_codes["BAD_REQUEST"]
@@ -90,14 +90,14 @@ class InvalidImageTypeError(ServerBaseException):
 
 
 class FilesNotFound(ServerBaseException):
-    def __init__(self, message="File or directory not found 📂", detail=None) -> None:
+    def __init__(self, message="Image not found 📂", detail=None) -> None:
         super().__init__(message)
         self.add_note(f"""
-            No se encuentra el archivo o ruta. {detail}
+            No se encuentra el archivo. {detail}
         """)
         self.error_code = error_codes["FILE_NOT_FOUND"]
-        self.status_code = status_codes["INTERNAL_SERVER_ERROR"]
-        self.http_argument = "Internal Server Error 💀"
+        self.status_code = status_codes["NOT_FOUND"]
+        self.http_argument = "Not Found 🚫"
 
 
 class PasswordDoNotMatchError(ServerBaseException):
@@ -165,6 +165,20 @@ class DuplicatedAppointmentError(ServerBaseException):
             Hay una cita pendiente, no puedes hacer otra hasta completar la anterior.
         """)
         self.error_code = error_codes["DUPLICATED_APPOINTMENT"]
+        self.status_code = status_codes["BAD_REQUEST"]
+        self.http_argument = "Bad Request ❓"
+
+
+class DuplicatedMedicalHistory(ServerBaseException):
+    def __init__(
+            self,
+            message="You cannot create two medical records for one appointment 🤡"
+    ) -> None:
+        super().__init__(message)
+        self.add_note("""
+            Ya hay un historial médico para esa cita.
+        """)
+        self.error_code = error_codes["DUPLICATED_MEDICAL_HISTORY"]
         self.status_code = status_codes["BAD_REQUEST"]
         self.http_argument = "Bad Request ❓"
         

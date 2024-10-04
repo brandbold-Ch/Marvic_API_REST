@@ -36,3 +36,15 @@ class AdminControllers:
     
     def change_password_to_user(self, **kwargs) -> dict:
         return self.admin.change_password_to_user(**kwargs)
+    
+    def update_appointment(
+        self, 
+        appointment_id: str, 
+        state: str
+    ) -> dict:
+        return self.admin.update_appointment(
+            appointment_id, state
+        )
+    
+    async def create_medical_history(self, **kwargs) -> dict:
+        return await self.admin.create_medical_history(**kwargs)

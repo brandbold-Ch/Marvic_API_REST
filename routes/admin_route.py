@@ -1,13 +1,14 @@
 from validators.admin_validator import validate_update, validate_create
 from controllers.admin_controller import AdminControllers
 from decorators.validator_decorators import authenticate
-from fastapi import Depends, status, Body, Query
+from fastapi import Depends, status, Body
 from utils.token_tools import CustomHTTPBearer
 from fastapi.responses import JSONResponse
 from utils.config_orm import SessionLocal
 from fastapi.requests import Request
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Path, Query, status, UploadFile, File, Form
 from typing import Annotated
+from typing import List
 
 
 admin = APIRouter()
@@ -102,16 +103,16 @@ async def get_appointments(
     )
 
 
-@admin.get("/{admin_id}/users/{user_id}", dependencies=[Depends(bearer)])
+@admin.get("/{admin_id}/users/{usr_id}", dependencies=[Depends(bearer)])
 @authenticate
 async def get_user(
     request: Request,
     admin_id: Annotated[str, Path(max_length=36)],
-    user_id: Annotated[str, Path(max_length=36)]
+    usr_id: Annotated[str, Path(max_length=36)]
 ) -> JSONResponse:
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=admin_controller.get_user(user_id)
+        content=admin_controller.get_user(usr_id)
     )
 
 @admin.put("/{admin_id}/users/{user_id}", dependencies=[Depends(bearer)])
@@ -161,3 +162,45 @@ async def get_appointment(
         status_code=status.HTTP_200_OK,
         content=admin_controller.get_appointment(appointment_id)
     )
+
+
+@admin.put("/{admin_id}/appointments/{appointment_id}", dependencies=[Depends(bearer)])
+@authenticate
+async def update_appointment(
+    request: Request,
+    admin_id: Annotated[str, Path(max_length=36)],
+    appointment_id: Annotated[str, Path(max_length=36)],
+    state = Query(...)
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=status.HTTP_202_ACCEPTED,
+        content=admin_controller.update_appointment(appointment_id, state)
+    )
+    
+
+@admin.post("/{admin_id}/appointments/{appointment_id}/medical-history", dependencies=[Depends(bearer)])
+@authenticate
+async def create_medical_history(
+    request: Request,
+    admin_id: Annotated[str, Path(max_length=36)],
+    appointment_id: Annotated[str, Path(max_length=36)],
+    issue: Annotated[str, Form(...)] = None,
+    images: Annotated[List[UploadFile], File(...)] = None
+) -> JSONResponse:
+    result: dict = await admin_controller.create_medical_history(
+        appointment_id=appointment_id,
+        issue=issue,
+        images=images
+    )
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={
+            "status": "Created 🆕",
+            "message": "Medical history created✅",
+            "codes": {
+                "status_code": status.HTTP_201_CREATED,
+            },
+            "data": result
+        }
+    )
+    

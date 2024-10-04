@@ -1,5 +1,16 @@
-from sqlalchemy import Column, Text, String, UUID, ForeignKey, Float, DateTime, Boolean
+from sqlalchemy.orm import relationship
 from utils.config_orm import Base
+from sqlalchemy import (
+    Column, 
+    Text, 
+    String, 
+    UUID, 
+    ForeignKey, 
+    Float, 
+    DateTime, 
+    Boolean
+)
+import os
 
 
 class AppointmentModel(Base):
@@ -14,7 +25,18 @@ class AppointmentModel(Base):
     status = Column(String(10), nullable=False)
     price = Column(Float, nullable=True)
     expired = Column(Boolean, nullable=False)
-
+    medical_history = relationship(
+        "MedicalHistoryModel",
+        back_populates="appointment", 
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
+    
+    def get_medical_history(self) -> dict | None:
+        if self.medical_history is None:
+            return None
+        return self.medical_history.to_dict()
+    
     def to_dict(self) -> dict:
         return {
             "id": str(self.id),
@@ -31,5 +53,6 @@ class AppointmentModel(Base):
                 "status": self.status,
                 "price": self.price,
                 "expired": self.expired
-            }
+            },
+            "medical_history": self.get_medical_history()
         }
