@@ -1,6 +1,4 @@
 from decorators.validator_decorators import entity_validator, appointment_checker
-from models.medical_history_model import MedicalHistoryModel
-from decorators.error_decorators import handle_exceptions
 from models.appointment_model import AppointmentModel
 from utils.notify_email import notify_admin
 from models.stack_model import StackModel

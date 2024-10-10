@@ -21,6 +21,7 @@ from errors.exception_classes import (
 import bcrypt
 from uuid import uuid4
 
+
 class AdminServices:
 
     def __init__(self, session: Session):

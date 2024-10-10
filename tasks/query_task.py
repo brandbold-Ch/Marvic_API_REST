@@ -19,6 +19,7 @@ def check_table_stack():
                 
             appt_data, pet_data, auth_data = data
             diff = (appt_data.timestamp.date() - datetime.now().date()).days
+            print(diff)
 
             if diff in [0, 1]:
                 notify_user(
@@ -28,6 +29,7 @@ def check_table_stack():
                     created_at=appt_data.created_at.strftime("%Y-%m-%d %I:%M:%S %p"),
                     pet_name=pet_data.name,
                     user_email=auth_data.email,
+                    pet_id=pet_data.id
                 )
                 appt_data.expired = True
                 stack.update_appointment(appt_data)

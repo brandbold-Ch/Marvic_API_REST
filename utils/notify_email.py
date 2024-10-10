@@ -6,6 +6,7 @@ from utils.load_statics import (
     load_reminder_appt_tmpl
 )
 
+
 def notify_admin(**kwargs) -> None:
     admin = AdminServices(SessionLocal()).get_unique_admin()
     
@@ -31,9 +32,9 @@ def notify_user(**kwargs) -> None:
             timestamp=kwargs.get("timestamp"),
             created_at=kwargs.get("created_at"),
             pet_name=kwargs.get("pet_name"),
-            user_name=kwargs.get("user_email")
+            user_name=kwargs.get("user_email"),
+            pet_id=kwargs.get("pet_id")
         ),
         "Recordatorio de Cita",
         kwargs.get("user_email")
     )
-    

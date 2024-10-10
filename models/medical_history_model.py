@@ -23,9 +23,9 @@ class MedicalHistoryModel(Base):
     )
     
     def get_images(self) -> list:
-        if self.medical_history.images is not None:
+        if self.images is not None:
             return [
-                f"{os.getenv('GET_IMAGE_URL')}{image.image}" for image in self.medical_history.images
+                f"{os.getenv('GET_IMAGE_URL')}{image.image}" for image in self.images
             ]
         return []
 
