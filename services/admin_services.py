@@ -149,7 +149,7 @@ class AdminServices:
         )
         self.session.add(medical_history_create)
         self.session.commit()
-        
+                        
         if kwargs.get("images") is not None:
             for image in kwargs.get("images"):
                 image_path = await upload_image(image)
@@ -174,6 +174,7 @@ class AdminServices:
         
         elif state in status_choices:
             appointment_update.status = state
+            appointment_update.expired = True
             self.session.add(appointment_update)
             self.session.commit()
             

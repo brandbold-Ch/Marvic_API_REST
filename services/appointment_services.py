@@ -1,6 +1,7 @@
 from decorators.validator_decorators import entity_validator, appointment_checker
 from models.appointment_model import AppointmentModel
 from utils.notify_email import notify_admin
+from utils.image_tools import delete_image
 from models.stack_model import StackModel
 from sqlalchemy.orm import Session
 from uuid import uuid4
@@ -49,6 +50,17 @@ class AppointmentServices:
 
     @entity_validator(appointment=True)
     def delete_appointment(self, **kwargs) -> None:
+        medical_history = kwargs.get("object_result").to_dict()
+        array_images = medical_history["medical_history"]
+        
         self.session.delete(kwargs.get("object_result"))
         self.session.commit()
         
+        if array_images is not None:
+            try:
+                for image in array_images["images"]:
+                    image_tag = image.split("/")
+                    delete_image(image_tag[-1])
+            except:
+                pass
+            

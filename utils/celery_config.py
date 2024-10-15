@@ -15,8 +15,8 @@ app = Celery(
 app.conf.beat_schedule = {
     "check-task-table": {
         "task": "tasks.query_task.check_table_stack",
-        "schedule": crontab(minute=0, hour=0)
+        "schedule": crontab(minute=0, hour=18)
     },
 }
 
-app.conf.timezone = "UTC"
+app.conf.timezone = "America/Mexico_City"

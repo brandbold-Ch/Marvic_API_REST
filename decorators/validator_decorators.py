@@ -79,9 +79,9 @@ def appointment_checker(func: Callable) -> Callable:
         ).all()
 
         for appointment in conflicting_appointments:        
-            if appointment.pet_id == pet_data.id:
+            if appointment.status == "pending":
                 raise DuplicatedAppointmentError()
-            
+             
             if appointment.timestamp == appt_data["timestamp"]:
                 raise BusyAppointmentError()
 
