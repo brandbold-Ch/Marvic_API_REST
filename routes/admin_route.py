@@ -19,8 +19,8 @@ bearer = CustomHTTPBearer()
 @admin.on_event("startup")
 def create_admin():
     admin_data = validate_create(
-        name="Admin",
-        lastname="Marvic",
+        name="Víctor Fernando",
+        lastname="Vázquez Domínguez",
         email="example@gmail.com",
         password="administrator123"
     )
